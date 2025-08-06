@@ -1,0 +1,12 @@
+{
+  "ios": {
+    "packageName": "com.monakassat.dz",
+    "launcherIconPath": "logo.png",
+    "appName": "صفقاتي"
+  },
+  "android": {
+    "packageName": "com.monakassat.dz",
+    "launcherIconPath": "logo.png",
+    "appName": "صفقاتي"
+  }
+}
