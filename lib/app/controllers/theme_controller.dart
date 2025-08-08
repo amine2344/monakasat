@@ -2,30 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:easy_localization/easy_localization.dart';
-
 import 'dart:ui' as ui;
-
 import '../../utils/theme_config.dart';
 
 class ThemeController extends GetxController {
   var isDarkMode = false.obs;
   var currentLocale = 'ar'.obs;
-  var textDirection = ui.TextDirection.rtl.obs; // Default to RTL for Arabic
+  var textDirection = ui.TextDirection.rtl.obs;
 
   ThemeData get theme => isDarkMode.value ? darkTheme : lightTheme;
 
   final ThemeData lightTheme = ThemeData(
     primaryColor: primaryColor,
     fontFamily: 'NotoKufiArabic',
-    scaffoldBackgroundColor: Colors.white,
+    scaffoldBackgroundColor: lightColor,
     appBarTheme: AppBarTheme(
-      backgroundColor: Colors.white,
-      foregroundColor: Colors.black,
+      surfaceTintColor: Colors.transparent,
+      backgroundColor: primaryColor,
+      foregroundColor: lightColor,
       titleTextStyle: Get.textTheme.bodyLarge,
     ),
     textTheme: const TextTheme(
       bodyLarge: TextStyle(color: Colors.black87, fontWeight: FontWeight.w500),
       bodyMedium: TextStyle(color: Colors.black54, fontWeight: FontWeight.w400),
+    ),
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      selectedItemColor: primaryColor,
+      unselectedItemColor: Colors.grey,
+      backgroundColor: Colors.white,
     ),
     cardColor: Colors.white,
     iconTheme: const IconThemeData(color: Colors.black54),
@@ -35,16 +39,45 @@ class ThemeController extends GetxController {
         foregroundColor: Colors.white,
       ),
     ),
+    listTileTheme: ListTileThemeData(
+      selectedTileColor: primaryColor.withOpacity(0.1),
+      textColor: Colors.black87,
+      selectedColor: primaryColor,
+      iconColor: Colors.black54,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 8.0,
+      ),
+      titleTextStyle: const TextStyle(
+        fontFamily: 'NotoKufiArabic',
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        color: Colors.black87,
+      ),
+      subtitleTextStyle: const TextStyle(
+        fontFamily: 'NotoKufiArabic',
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: Colors.black54,
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+    ),
   );
 
   final ThemeData darkTheme = ThemeData(
     primaryColor: primaryColor,
     fontFamily: 'NotoKufiArabic',
-    scaffoldBackgroundColor: Colors.grey[900],
+    scaffoldBackgroundColor: darkColor,
     appBarTheme: AppBarTheme(
-      backgroundColor: const Color(0xFF303030),
+      surfaceTintColor: Colors.transparent,
+      backgroundColor: primaryColor,
       foregroundColor: Colors.white,
       titleTextStyle: Get.textTheme.bodyLarge?.copyWith(color: Colors.white),
+    ),
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      selectedItemColor: primaryColor,
+      unselectedItemColor: Colors.grey,
+      backgroundColor: darkColor,
     ),
     textTheme: const TextTheme(
       bodyLarge: TextStyle(color: Colors.white70, fontWeight: FontWeight.w500),
@@ -58,6 +91,29 @@ class ThemeController extends GetxController {
         foregroundColor: Colors.white,
       ),
     ),
+    listTileTheme: ListTileThemeData(
+      selectedTileColor: primaryColor.withOpacity(0.2),
+      textColor: Colors.white70,
+      selectedColor: primaryColor,
+      iconColor: Colors.white54,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 8.0,
+      ),
+      titleTextStyle: const TextStyle(
+        fontFamily: 'NotoKufiArabic',
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        color: Colors.white70,
+      ),
+      subtitleTextStyle: const TextStyle(
+        fontFamily: 'NotoKufiArabic',
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: Colors.white54,
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+    ),
   );
 
   @override
@@ -69,6 +125,7 @@ class ThemeController extends GetxController {
   void toggleTheme() {
     isDarkMode.value = !isDarkMode.value;
     saveThemePreference();
+    update();
   }
 
   Future<void> loadThemePreference() async {

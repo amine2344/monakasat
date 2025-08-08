@@ -4,6 +4,7 @@
   "dashboard": "لوحة التحكم",
   "my_offers": "عروضي",
   "settings": "الإعدادات",
+  "profile": "الملف الشخصي",
   "language": "اللغة",
   "theme": "الثيم",
   "light_mode": "الوضع الفاتح",
@@ -83,5 +84,60 @@
   "previous": "السابق",
   "login_failed": "فشل تسجيل الدخول",
   "signup_failed": "فشل إنشاء الحساب",
-  "role_mismatch": "الدور المختار لا يتطابق مع حسابك"
+  "role_mismatch": "الدور المختار لا يتطابق مع حسابك",
+  "edit_profile": "تحرير الملف الشخصي",
+  "edit_profile_coming_soon": "سيتم إضافة وظيفة التحرير قريبًا"
+  ,  "guest_user": "مستخدم ضيف"
+,
+  "planning_stage": "التخطيط وتحديد الاحتياجات",
+  "enter_project_details": "أدخل تفاصيل المشروع",
+ 
+  "requirements": "المتطلبات",
+ 
+  "save_data": "حفظ البيانات",
+  "construction": "البناء",
+  "it_services": "خدمات تكنولوجيا المعلومات",
+  "consulting": "الاستشارات",
+  "supply": "التوريد",
+  "error": "خطأ",
+  "success": "نجاح",
+  "user_not_logged_in": "المستخدم غير مسجل الدخول",
+  "project_details_saved": "تم حفظ تفاصيل المشروع بنجاح",
+  "failed_to_save_project": "فشل في حفظ تفاصيل المشروع",
+   "my_tenders": "مناقصاتي",
+  "available_tenders": "المناقصات المتاحة",
+  "no_offers_available": "لا توجد مناقصات أو عروض متاحة",
+  "category": "القطاع: %s",
+  
+  "date": "التاريخ: %s",
+  "stage": "المرحلة: %s",
+  "offers_received": "العروض المستلمة: %s",
+  "offer_status": "حالة العرض: %s",
+  
+  "tender_announcement": "الإعلان عن المناقصة",
+  "offer_submission": "تقديم العروض",
+  "opening_envelopes": "فتح الأظرفة",
+  "offer_evaluation": "تقييم العروض",
+  "contract_approval": "المصادقة وإبرام العقد",
+  "execution_monitoring": "التنفيذ والمتابعة",
+  
+  "unknown_stage": "مرحلة غير معروفة",
+  
+  "confirm_password": "تأكيد كلمة المرور",
+  
+  "please_confirm_password": "يرجى تأكيد كلمة المرور",
+  "passwords_do_not_match": "كلمات المرور غير متطابقة",
+  
+  "cancel": "إلغاء", "notifications": "الإشعارات",
+  "role": "الدور",
+  
+  
+  "add_project": "إضافة مشروع",
+  "project_planning": "تخطيط المشروع",
+  "please_enter_legal_requirements": "يرجى إدخال المتطلبات القانونية",
+  
+  "please_select_dates": "يرجى تحديد تواريخ البداية والنهاية",
+  "end_date_before_start": "تاريخ النهاية قبل تاريخ البداية",
+  "tender_published": "تم نشر المناقصة",
+  "publish_tender_failed": "فشل نشر المناقصة"
 }

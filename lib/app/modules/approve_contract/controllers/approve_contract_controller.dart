@@ -35,7 +35,7 @@ class ApproveContractController extends GetxController {
         await _firebaseService.sendNotification(
           'tender_${tender.id}',
           'المصادقة على العقد'.tr(),
-          'تمت المصادقة على العقد للمناقصة: ${tender.title}'.tr(),
+          'تمت المصادقة على العقد للمناقصة: ${tender.projectName}'.tr(),
         );
         Get.toNamed(Routes.EXECUTION, arguments: tender);
       } else {

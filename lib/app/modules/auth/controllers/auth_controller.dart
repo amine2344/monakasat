@@ -10,8 +10,11 @@ class AuthController extends GetxController {
   final FirebaseService firebaseService = FirebaseService();
   var isLoading = false.obs;
   var selectedRole = 'contractor'.obs;
-  var currentStep = 1.obs;
+  var profilePhotoUrl = ''.obs;
+  var confirmPassword = ''.obs;
 
+  var currentStep = 1.obs;
+  RxBool isPasswordHide = true.obs;
   // Step 1 fields
   var email = ''.obs;
   var phone = ''.obs;
@@ -27,6 +30,56 @@ class AuthController extends GetxController {
   var companyName = ''.obs;
   var companyAddress = ''.obs;
   var companyPhone = ''.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _loadUserData();
+  }
+
+  void togglePassHide() {
+    isPasswordHide.value = !isPasswordHide.value;
+    update();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final user = firebaseService.auth.currentUser;
+      if (user != null) {
+        final userDoc = await firebaseService.firestore
+            .collection('users')
+            .doc(user.uid)
+            .get();
+        if (userDoc.exists) {
+          final data = userDoc.data()!;
+          email.value = data['email'] ?? '';
+          phone.value = data['phone'] ?? '';
+          selectedRole.value = data['role'] ?? 'contractor';
+          profilePhotoUrl.value = data['profilePhotoUrl'] ?? '';
+          if (selectedRole.value == 'contractor') {
+            name.value = data['name'] ?? '';
+            prename.value = data['prename'] ?? '';
+            wilaya.value = data['wilaya'] ?? '';
+            activitySector.value = data['activitySector'] ?? '';
+          } else {
+            companyName.value = data['companyName'] ?? '';
+            companyAddress.value = data['companyAddress'] ?? '';
+            companyPhone.value = data['companyPhone'] ?? '';
+          }
+        } else {
+          // No user data in Firestore, reset fields
+          resetFields();
+        }
+      } else {
+        // No user logged in, reset fields
+        resetFields();
+      }
+    } catch (e) {
+      debugPrint('ERROR LOADING USER DATA ==> ${e.toString()}');
+      Get.snackbar('خطأ'.tr(), 'failed_to_load_user_data'.tr());
+      resetFields();
+    }
+  }
 
   void selectRole(String role) {
     selectedRole.value = role;
@@ -44,6 +97,7 @@ class AuthController extends GetxController {
     companyName.value = '';
     companyAddress.value = '';
     companyPhone.value = '';
+    profilePhotoUrl.value = '';
     currentStep.value = 1;
   }
 
@@ -66,7 +120,6 @@ class AuthController extends GetxController {
             .get();
         final userRole = userDoc.data()?['role'] ?? 'contractor';
         if (userRole == selectedRole.value) {
-          // Register device token
           final token = await firebaseService.messaging.getToken();
           if (token != null) {
             await firebaseService.firestore
@@ -74,18 +127,15 @@ class AuthController extends GetxController {
                 .doc(user.uid)
                 .update({'deviceToken': token});
           }
-          /* if (userRole == 'contractor') {
-            Get.offAllNamed(Routes.MY_OFFERS);
-          } else { */
+          await _loadUserData();
           Get.offAllNamed(Routes.DASHBOARD);
-          /* } */
         } else {
           Get.snackbar('خطأ'.tr(), 'role_mismatch'.tr());
           await firebaseService.signOut();
         }
       }
     } catch (e) {
-      debugPrint('EROR LOGIN ===> ${e.toString()}');
+      debugPrint('ERROR LOGIN ==> ${e.toString()}');
       Get.snackbar('خطأ'.tr(), 'login_failed'.tr());
     } finally {
       isLoading.value = false;
@@ -93,62 +143,35 @@ class AuthController extends GetxController {
   }
 
   Future<void> signUp() async {
+    isLoading.value = true;
     try {
-      isLoading.value = true;
-      final user = await firebaseService.signUp(
-        email.value,
-        password.value,
-        selectedRole.value == 'contractor'
-            ? '$prename $name'
-            : companyName.value,
-        selectedRole.value,
-      );
+      final userCredential = await firebaseService.auth
+          .createUserWithEmailAndPassword(
+            email: email.value,
+            password: password.value,
+          );
+      final user = userCredential.user;
       if (user != null) {
-        // Save additional info
-        final userData = {
+        await firebaseService.firestore.collection('users').doc(user.uid).set({
           'email': email.value,
           'phone': phone.value,
           'role': selectedRole.value,
-          'subscription': 'free',
-        };
-        if (selectedRole.value == 'contractor') {
-          userData.addAll({
+          if (selectedRole.value == 'contractor') ...{
             'name': name.value,
             'prename': prename.value,
             'wilaya': wilaya.value,
             'activitySector': activitySector.value,
-          });
-        } else {
-          userData.addAll({
+          } else ...{
             'companyName': companyName.value,
             'companyAddress': companyAddress.value,
             'companyPhone': companyPhone.value,
-          });
-        }
-        await firebaseService.firestore
-            .collection('users')
-            .doc(user.user?.uid)
-            .set(userData, SetOptions(merge: true));
-
-        // Register device token
-        final token = await firebaseService.messaging.getToken();
-        if (token != null) {
-          await firebaseService.firestore
-              .collection('users')
-              .doc(user.user?.uid)
-              .update({'deviceToken': token});
-        }
-
-        Get.offAllNamed(
-          /* selectedRole.value == 'contractor'
-              ? Routes.MY_OFFERS
-              : */
-          Routes.DASHBOARD,
-        );
+          },
+          'createdAt': DateTime.now(),
+        });
+        Get.offAllNamed('/dashboard');
       }
     } catch (e) {
-      debugPrint('EROR ===> ${e.toString()}');
-      Get.snackbar('خطأ'.tr(), '${'signup_failed'.tr()}${e.toString()}');
+      Get.snackbar('error'.tr(), 'signup_failed'.tr());
     } finally {
       isLoading.value = false;
     }

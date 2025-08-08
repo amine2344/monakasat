@@ -1,3 +1,4 @@
+import 'package:sizer/sizer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
@@ -14,7 +15,7 @@ void main() async {
   final themeController = ThemeController();
   Get.put(themeController);
   await themeController.loadThemePreference();
-  await themeController.loadLocalePreference(); // Load locale before runApp
+  await themeController.loadLocalePreference();
 
   runApp(
     EasyLocalization(
@@ -22,8 +23,7 @@ void main() async {
       path: 'assets/translations',
       fallbackLocale: const Locale('ar'),
       useOnlyLangCode: true,
-      startLocale:
-          await _getSavedLocale(), // Set initial locale from shared_preferences
+      startLocale: await _getSavedLocale(),
       child: MounakassatApp(themeController: themeController),
     ),
   );
@@ -42,20 +42,24 @@ class MounakassatApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'app_title'.tr(),
-      debugShowCheckedModeBanner: false,
-      theme: themeController.theme,
-      locale: context.locale,
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      initialRoute: AppPages.INITIAL,
-      getPages: AppPages.routes,
-      builder: (context, child) {
+    return ResponsiveSizer(
+      builder: (context, orientation, deviceType) {
         return Obx(
-          () => Directionality(
-            textDirection: themeController.textDirection.value,
-            child: child ?? Container(),
+          () => GetMaterialApp(
+            title: 'app_title'.tr(),
+            debugShowCheckedModeBanner: false,
+            theme: themeController.theme,
+            locale: context.locale,
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            initialRoute: AppPages.INITIAL,
+            getPages: AppPages.routes,
+            builder: (context, child) {
+              return Directionality(
+                textDirection: themeController.textDirection.value,
+                child: child ?? Container(),
+              );
+            },
           ),
         );
       },

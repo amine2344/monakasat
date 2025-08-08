@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
+import 'package:mounakassat_dz/app/widgets/custom_appbar.dart';
 
 import '../../../../utils/theme_config.dart';
 import '../../../controllers/theme_controller.dart';
@@ -15,6 +16,12 @@ class SettingsView extends StatelessWidget {
     final AuthController authController = Get.find<AuthController>();
 
     return Scaffold(
+      appBar: CustomAppBar(
+        titleText: 'settings'.tr(),
+
+        automaticallyImplyLeading: true,
+        centerTitle: false,
+      ),
       body: Directionality(
         textDirection: themeController.textDirection.value,
         child: Padding(

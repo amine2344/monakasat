@@ -59,19 +59,27 @@ class FirebaseService {
   }
 
   Stream<List<TenderModel>> getTenders() {
-    return firestore
-        .collection('tenders')
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => TenderModel.fromJson(doc.data()))
-              .toList(),
-        );
+    return firestore.collection('projects').snapshots().asyncMap((
+      snapshot,
+    ) async {
+      List<TenderModel> tenders = [];
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        final userDoc = await firestore
+            .collection('users')
+            .doc(data['userId'])
+            .get();
+        final userData = userDoc.data();
+        data['announcer'] = userData?['name'] ?? 'Unknown';
+        tenders.add(TenderModel.fromJson(data, doc.id));
+      }
+      return tenders;
+    });
   }
 
-  Future<void> addTender(TenderModel tender) async {
+  /* Future<void> addTender(TenderModel tender) async {
     await firestore.collection('tenders').doc(tender.id).set(tender.toJson());
-  }
+  } */
 
   Stream<List<TenderStageModel>> getTenderStages(String tenderId) {
     return firestore

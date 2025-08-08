@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:mounakassat_dz/app/data/services/firebase_service.dart';
+import 'package:mounakassat_dz/app/modules/notifications/controllers/notifications_controller.dart';
 
 import '../../auth/controllers/auth_controller.dart';
 import '../controllers/dashboard_controller.dart';
@@ -12,11 +14,11 @@ import '../../home/controllers/home_controller.dart';
 class DashboardBinding extends Bindings {
   @override
   void dependencies() {
-    if (!Get.isRegistered<AuthController>()) {
-      Get.put(AuthController());
-    }
+    Get.put(AuthController());
     Get.put(SettingsController());
     Get.lazyPut<DashboardController>(() => DashboardController());
+    Get.lazyPut<NotificationsController>(() => NotificationsController());
+    Get.lazyPut<FirebaseService>(() => FirebaseService());
     Get.lazyPut<HomeController>(() => HomeController());
     Get.lazyPut<ProfileController>(() => ProfileController());
     Get.lazyPut<MyOffersController>(() => MyOffersController());

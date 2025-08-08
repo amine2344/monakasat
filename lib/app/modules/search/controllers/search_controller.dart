@@ -12,7 +12,7 @@ class SearchController extends GetxController {
 
   void searchTenders() {
     _firebaseService.getTenders().listen((tenderList) {
-      searchResults.assignAll(
+      /* searchResults.assignAll(
         tenderList
             .where(
               (tender) =>
@@ -23,7 +23,7 @@ class SearchController extends GetxController {
                       tender.category == selectedCategory.value),
             )
             .toList(),
-      );
+      ); */
     });
   }
 }

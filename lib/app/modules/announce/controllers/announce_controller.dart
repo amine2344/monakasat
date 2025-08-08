@@ -1,15 +1,10 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
-import '../../../data/models/tender_model.dart';
-import '../../../data/models/tender_stage_model.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../../data/services/firebase_service.dart';
-import '../../../routes/app_pages.dart';
 
 class AnnounceController extends GetxController {
-  final FirebaseService _firebaseService = FirebaseService();
+  final FirebaseService firebaseService = Get.find<FirebaseService>();
   var isLoading = false.obs;
   var startDate = Rxn<DateTime>();
   var endDate = Rxn<DateTime>();
@@ -24,46 +19,55 @@ class AnnounceController extends GetxController {
 
   Future<void> announceTender(
     String legalRequirements,
-    FilePickerResult? file,
-  ) async {
+    FilePickerResult? selectedFile, {
+    String? projectId,
+    required String projectName,
+    required String serviceType,
+    required String requirements,
+    required double budget,
+  }) async {
+    isLoading.value = true;
     try {
-      isLoading.value = true;
-      final tender = Get.arguments as TenderModel?;
-      if (tender != null &&
-          file != null &&
-          startDate.value != null &&
-          endDate.value != null) {
-        final fileUrl = await _firebaseService.uploadFile(
-          File(file.files.single.path!),
-          'tenders/${tender.id}/documents/${file.files.single.name}',
-        );
-        await _firebaseService.addTenderStage(
-          TenderStageModel(
-            id: 'stage2_${tender.id}',
-            tenderId: tender.id,
-            stageName: 'announce_tender',
-            status: 'completed',
-            details: {
-              'legalRequirements': legalRequirements,
-              'documentUrl': fileUrl,
-              'startDate': startDate.value!.toIso8601String(),
-              'endDate': endDate.value!.toIso8601String(),
-            },
-            startDate: DateTime.now(),
-            endDate: DateTime.now(),
-          ),
-        );
-        await _firebaseService.sendNotification(
-          'tender_${tender.id}',
-          'إعلان مناقصة جديدة'.tr(),
-          'تم الإعلان عن مناقصة جديدة: ${tender.title}'.tr(),
-        );
-        Get.toNamed(Routes.SUBMIT_OFFERS, arguments: tender);
-      } else {
-        Get.snackbar('خطأ'.tr(), 'يرجى ملء جميع الحقول'.tr());
+      final userId = firebaseService.auth.currentUser?.uid;
+      if (userId == null) {
+        Get.snackbar('error'.tr(), 'user_not_authenticated'.tr());
+        return;
       }
+      if (startDate.value == null || endDate.value == null) {
+        Get.snackbar('error'.tr(), 'please_select_dates'.tr());
+        return;
+      }
+      if (endDate.value!.isBefore(startDate.value!)) {
+        Get.snackbar('error'.tr(), 'end_date_before_start'.tr());
+        return;
+      }
+
+      final tenderData = {
+        'userId': userId,
+        'projectName': projectName,
+        'serviceType': serviceType,
+        'requirements': requirements,
+        'budget': budget,
+        'legalRequirements': legalRequirements,
+        'startDate': startDate.value,
+        'endDate': endDate.value,
+        'createdAt': DateTime.now(),
+        'stage': 'announced',
+        'documentName': selectedFile?.files.single.name,
+      };
+
+      if (projectId != null) {
+        await firebaseService.firestore
+            .collection('projects')
+            .doc(projectId)
+            .update(tenderData);
+      } else {
+        await firebaseService.firestore.collection('projects').add(tenderData);
+      }
+      Get.snackbar('success'.tr(), 'tender_published'.tr());
+      Get.offAllNamed('/my_offers');
     } catch (e) {
-      Get.snackbar('خطأ'.tr(), 'فشل في نشر الإعلان: $e'.tr());
+      Get.snackbar('error'.tr(), 'publish_tender_failed'.tr());
     } finally {
       isLoading.value = false;
     }

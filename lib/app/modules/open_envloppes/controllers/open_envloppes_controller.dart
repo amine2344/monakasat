@@ -43,7 +43,7 @@ class OpenEnvelopesController extends GetxController {
         await _firebaseService.sendNotification(
           'tender_${tender.id}',
           'فتح الأظرفة'.tr(),
-          'تم فتح الأظرفة للمناقصة: ${tender.title}'.tr(),
+          'تم فتح الأظرفة للمناقصة: ${tender.projectName}'.tr(),
         );
         Get.toNamed(Routes.EVALUATE_OFFERS, arguments: tender);
       }

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mounakassat_dz/utils/theme_config.dart';
+import 'package:sizer/sizer.dart';
+
+import '../controllers/theme_controller.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? title;
   final String? titleText;
   final TextStyle? titleTextStyle;
   final Widget? leading;
+  final Widget? trailing;
   final bool automaticallyImplyLeading;
   final List<Widget>? actions;
   final Color? backgroundColor;
@@ -27,6 +31,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.fromDash,
     this.titleText,
     this.titleTextStyle,
+    this.trailing,
     this.leading,
     this.automaticallyImplyLeading = true,
     this.actions,
@@ -51,25 +56,45 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ? Padding(
               padding: const EdgeInsets.symmetric(vertical: 4.0),
               child: Image.asset(
-                'assets/images/logo.png',
-                height: context.height * 0.06,
-                width: context.width * .2,
+                'assets/images/logo-top.png',
+                height: context.height * 0.1,
+                width: context.width * .3,
+                color: lightColor,
+                colorBlendMode: BlendMode.srcIn,
               ),
             )
-          : title ?? (titleText != null ? Text(titleText!) : null),
+          : title ??
+                (titleText != null
+                    ? Text(
+                        titleText!,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: lightColor,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )
+                    : null),
       leading: leading,
       automaticallyImplyLeading: automaticallyImplyLeading,
       actions: [
         ...?actions,
+        if (trailing != null)
+          Padding(
+            padding: EdgeInsets.only(top: 10.0, left: 5.w, right: 5.w),
+            child: trailing!,
+          ),
         if (onEndDrawerPressed != null)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-            child: Card(
-              elevation: 1,
-              color: primaryColor,
+            padding: EdgeInsetsGeometry.symmetric(horizontal: 20, vertical: 5),
+            child: Container(
+              height: 40,
+              width: 40,
+              decoration: BoxDecoration(
+                color: lightColor.withOpacity(.8),
+                borderRadius: BorderRadius.circular(5),
+              ),
               child: Center(
                 child: IconButton(
-                  icon: Icon(endDrawerIcon),
+                  icon: Icon(endDrawerIcon, color: primaryColor),
                   onPressed: onEndDrawerPressed,
                 ),
               ),

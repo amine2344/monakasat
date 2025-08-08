@@ -4,6 +4,7 @@
   "dashboard": "Tableau de bord",
   "my_offers": "Mes offres",
   "settings": "Paramètres",
+  "profile": "Profil",
   "language": "Langue",
   "theme": "Thème",
   "light_mode": "Mode clair",
@@ -83,5 +84,72 @@
   "previous": "Précédent",
   "login_failed": "Échec de la connexion",
   "signup_failed": "Échec de l'inscription",
-  "role_mismatch": "Le rôle sélectionné ne correspond pas à votre compte"
+  "role_mismatch": "Le rôle sélectionné ne correspond pas à votre compte",
+  "edit_profile": "Modifier le profil",
+    "guest_user": "Utilisateur invité"
+,"planning_stage": "Planification et évaluation des besoins",
+  "enter_project_details": "Entrez les détails du projet",
+  "requirements": "Exigences",
+  
+  "save_data": "Enregistrer les données",
+  "construction": "Construction",
+  "it_services": "Services informatiques",
+  "consulting": "Consultation",
+  "supply": "Fourniture",
+  "error": "Erreur",
+  "success": "Succès",
+  "user_not_logged_in": "Utilisateur non connecté",
+  "project_details_saved": "Détails du projet enregistrés avec succès",
+  "failed_to_save_project": "Échec de l'enregistrement des détails du projet",
+  "edit_profile_coming_soon": "La fonction de modification sera bientôt disponible",
+  "my_tenders": "Mes appels d'offres",
+  "available_tenders": "Appels d'offres disponibles",
+  "no_offers_available": "Aucun appel d'offres ou proposition disponible",
+  "category": "Catégorie: %s",
+  
+  "date": "Date: %s",
+  "stage": "Étape: %s",
+  "offers_received": "Offres reçues: %s",
+  "offer_status": "Statut de l'offre: %s",
+  
+  "tender_announcement": "Annonce de l'appel d'offres",
+  "offer_submission": "Soumission des offres",
+  "opening_envelopes": "Ouverture des enveloppes",
+  "offer_evaluation": "Évaluation des offres",
+  "contract_approval": "Approbation et signature du contrat",
+  "execution_monitoring": "Exécution et suivi",
+  
+  "unknown_stage": "Étape inconnue",
+  
+  "confirm_password": "Confirmer le mot de passe",
+  
+  "please_confirm_password": "Veuillez confirmer le mot de passe",
+  "passwords_do_not_match": "Les mots de passe ne correspondent pas",
+  
+  "cancel": "Annuler","notifications": "Notifications",
+  "role": "Rôle",
+  "please_enter_project_name": "Veuillez entrer le nom du projet",
+  "please_enter_service_type": "Veuillez entrer le type de service",
+  "please_select_service_type": "Veuillez sélectionner le type de service",
+  "please_enter_requirements": "Veuillez entrer les exigences",
+  "please_enter_budget": "Veuillez entrer le budget",
+  "invalid_budget": "Budget invalide",
+  
+  "project_saved": "Projet enregistré",
+  "save_project_failed": "Échec de l'enregistrement du projet",
+  "user_not_authenticated": "Utilisateur non authentifié",
+  "edit_project": "Modifier le projet",
+  "edit_project_details": "Modifier les détails du projet",
+  "project_updated": "Projet mis à jour",
+  "update_project_failed": "Échec de la mise à jour du projet",
+  "please_enter_legal_requirements": "Veuillez entrer les exigences légales",
+  
+  "please_select_dates": "Veuillez sélectionner les dates de début et de fin",
+  "end_date_before_start": "La date de fin est avant la date de début",
+  "tender_published": "Appel d'offres publié",
+  "publish_tender_failed": "Échec de la publication de l'appel d'offres",
+
+  "add_project": "Ajouter un projet",
+  "project_planning": "Planification du projet"
+  
 }

@@ -1,10 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mounakassat_dz/app/routes/app_pages.dart';
 import 'package:mounakassat_dz/app/widgets/custom_appbar.dart';
+
 import '../../../../utils/theme_config.dart';
 import '../../../controllers/theme_controller.dart';
+import '../../../widgets/custom_textfield.dart';
 import '../controllers/auth_controller.dart';
 
 class LoginView extends GetView<AuthController> {
@@ -30,7 +33,7 @@ class LoginView extends GetView<AuthController> {
       body: Directionality(
         textDirection: Get.find<ThemeController>().textDirection.value,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0),
           child: Card(
             elevation: 0,
             color: Get.theme.scaffoldBackgroundColor,
@@ -59,51 +62,56 @@ class LoginView extends GetView<AuthController> {
                       () => Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          ChoiceChip(
-                            label: Text('contractor'.tr()),
-                            selected:
-                                controller.selectedRole.value == 'contractor',
-                            selectedColor: primaryColor,
-                            labelStyle: TextStyle(
-                              color:
-                                  controller.selectedRole.value == 'contractor'
-                                  ? Colors.white
-                                  : Get.theme.textTheme.bodyMedium!.color,
+                          Expanded(
+                            child: ChoiceChip(
+                              label: Center(child: Text('contractor'.tr())),
+                              selected:
+                                  controller.selectedRole.value == 'contractor',
+                              selectedColor: primaryColor,
+                              labelStyle: TextStyle(
+                                fontFamily: 'NotoKufiArabic',
+                                color:
+                                    controller.selectedRole.value ==
+                                        'contractor'
+                                    ? Colors.white
+                                    : Colors.blueGrey,
+                              ),
+                              onSelected: (selected) {
+                                if (selected)
+                                  controller.selectRole('contractor');
+                              },
                             ),
-                            onSelected: (selected) {
-                              if (selected) controller.selectRole('contractor');
-                            },
                           ),
                           const SizedBox(width: 8),
-                          ChoiceChip(
-                            label: Text('project_owner'.tr()),
-                            selected:
-                                controller.selectedRole.value ==
-                                'project_owner',
-                            selectedColor: primaryColor,
-                            labelStyle: TextStyle(
-                              color:
+                          Expanded(
+                            child: ChoiceChip(
+                              label: Center(child: Text('project_owner'.tr())),
+                              selected:
                                   controller.selectedRole.value ==
-                                      'project_owner'
-                                  ? Colors.white
-                                  : Get.theme.textTheme.bodyMedium!.color,
+                                  'project_owner',
+                              selectedColor: primaryColor,
+                              labelStyle: TextStyle(
+                                fontFamily: 'NotoKufiArabic',
+                                color:
+                                    controller.selectedRole.value ==
+                                        'project_owner'
+                                    ? Colors.white
+                                    : Colors.blueGrey,
+                              ),
+                              onSelected: (selected) {
+                                if (selected)
+                                  controller.selectRole('project_owner');
+                              },
                             ),
-                            onSelected: (selected) {
-                              if (selected)
-                                controller.selectRole('project_owner');
-                            },
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    CustomTextField(
                       controller: emailController,
-                      decoration: InputDecoration(
-                        labelText: 'email'.tr(),
-                        border: const OutlineInputBorder(),
-                        prefixIcon: const Icon(Icons.email),
-                      ),
+                      labelText: 'email'.tr(),
+                      prefixIcon: Icons.email,
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -116,28 +124,44 @@ class LoginView extends GetView<AuthController> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
-                      controller: passwordController,
-                      decoration: InputDecoration(
+                    Obx(
+                      () => CustomTextField(
+                        controller: passwordController,
                         labelText: 'password'.tr(),
-                        border: const OutlineInputBorder(),
-                        prefixIcon: const Icon(Icons.lock),
+
+                        prefixIcon: Icons.lock,
+                        obscureText: controller.isPasswordHide.value,
+                        suffixIcon: Padding(
+                          padding: const EdgeInsets.only(right: 4.0),
+                          child: IconButton(
+                            icon: Icon(
+                              !controller.isPasswordHide.value
+                                  ? Icons.remove_red_eye_outlined
+                                  : Icons.remove_red_eye,
+                            ),
+                            onPressed: controller.togglePassHide,
+                          ),
+                        ),
+
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'please_enter_password'.tr();
+                          }
+                          if (value.length < 6) {
+                            return 'password_too_short'.tr();
+                          }
+                          return null;
+                        },
                       ),
-                      obscureText: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'please_enter_password'.tr();
-                        }
-                        if (value.length < 6) {
-                          return 'password_too_short'.tr();
-                        }
-                        return null;
-                      },
                     ),
                     const SizedBox(height: 24),
                     Obx(
                       () => controller.isLoading.value
-                          ? const Center(child: CircularProgressIndicator())
+                          ? const Center(
+                              child: CupertinoActivityIndicator(
+                                color: primaryColor,
+                              ),
+                            )
                           : ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: primaryColor,
@@ -167,13 +191,15 @@ class LoginView extends GetView<AuthController> {
                             ),
                     ),
                     const SizedBox(height: 16),
-                    TextButton(
-                      onPressed: () => Get.toNamed(Routes.SIGNUP),
-                      child: Text(
-                        'create_account'.tr(),
-                        style: const TextStyle(
-                          fontFamily: 'NotoKufiArabic',
-                          color: primaryColor,
+                    GestureDetector(
+                      onTap: () => Get.toNamed(Routes.SIGNUP),
+                      child: Center(
+                        child: Text(
+                          'create_account'.tr(),
+                          style: const TextStyle(
+                            fontFamily: 'NotoKufiArabic',
+                            color: primaryColor,
+                          ),
                         ),
                       ),
                     ),

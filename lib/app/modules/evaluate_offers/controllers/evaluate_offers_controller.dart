@@ -46,7 +46,7 @@ class EvaluateOffersController extends GetxController {
         await _firebaseService.sendNotification(
           'tender_${tender.id}',
           'تقييم العروض'.tr(),
-          'تم اختيار الفائز للمناقصة: ${tender.title}'.tr(),
+          'تم اختيار الفائز للمناقصة: ${tender.projectName}'.tr(),
         );
         Get.toNamed(Routes.APPROVE_CONTRACT, arguments: tender);
       }

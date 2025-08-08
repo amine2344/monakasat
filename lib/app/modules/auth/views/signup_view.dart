@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
+import 'package:sizer/sizer.dart';
 import 'package:mounakassat_dz/app/routes/app_pages.dart';
 import 'package:mounakassat_dz/app/widgets/custom_appbar.dart';
+import 'package:mounakassat_dz/app/widgets/custom_button.dart';
+
 import '../../../../utils/theme_config.dart';
 import '../../../controllers/theme_controller.dart';
+import '../../../widgets/custom_textfield.dart';
 import '../controllers/auth_controller.dart';
 
 class SignUpView extends GetView<AuthController> {
@@ -77,16 +81,89 @@ class SignUpView extends GetView<AuthController> {
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
+    final emailController = TextEditingController(text: controller.email.value);
+    final phoneController = TextEditingController(text: controller.phone.value);
+    final passwordController = TextEditingController(
+      text: controller.password.value,
+    );
+    final confirmPasswordController = TextEditingController(
+      text: controller.confirmPassword.value,
+    );
+    final nameController = TextEditingController(text: controller.name.value);
+    final prenameController = TextEditingController(
+      text: controller.prename.value,
+    );
+    final wilayaController = TextEditingController(
+      text: controller.wilaya.value,
+    );
+    final activitySectorController = TextEditingController(
+      text: controller.activitySector.value,
+    );
+    final companyNameController = TextEditingController(
+      text: controller.companyName.value,
+    );
+    final companyAddressController = TextEditingController(
+      text: controller.companyAddress.value,
+    );
+    final companyPhoneController = TextEditingController(
+      text: controller.companyPhone.value,
+    );
+
+    String? validate(String? value, String field) {
+      switch (field) {
+        case 'email':
+          if (value == null || value.isEmpty) return 'please_enter_email'.tr();
+          if (!GetUtils.isEmail(value)) return 'invalid_email'.tr();
+          return null;
+        case 'phone':
+          if (value == null || value.isEmpty) return 'please_enter_phone'.tr();
+          return null;
+        case 'password':
+          if (value == null || value.isEmpty)
+            return 'please_enter_password'.tr();
+          if (value.length < 6) return 'password_too_short'.tr();
+          return null;
+        case 'confirm_password':
+          if (value == null || value.isEmpty)
+            return 'please_confirm_password'.tr();
+          if (value != passwordController.text)
+            return 'passwords_do_not_match'.tr();
+          return null;
+        case 'name':
+          if (value == null || value.isEmpty) return 'please_enter_name'.tr();
+          return null;
+        case 'prename':
+          if (value == null || value.isEmpty)
+            return 'please_enter_prename'.tr();
+          return null;
+        case 'wilaya':
+          if (value == null || value.isEmpty)
+            return 'please_select_wilaya'.tr();
+          return null;
+        case 'activity_sector':
+          if (value == null || value.isEmpty)
+            return 'please_select_activity_sector'.tr();
+          return null;
+        default:
+          return null;
+      }
+    }
 
     return Scaffold(
       backgroundColor: Get.theme.scaffoldBackgroundColor,
       appBar: CustomAppBar(
-        title: Text('signup'.tr(), style: Get.textTheme.bodyLarge),
+        title: Text(
+          'signup'.tr(),
+          style: const TextStyle(
+            fontFamily: 'NotoKufiArabic',
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
       body: Directionality(
         textDirection: Get.find<ThemeController>().textDirection.value,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0),
           child: Card(
             elevation: 0,
             color: Get.theme.scaffoldBackgroundColor,
@@ -118,222 +195,180 @@ class SignUpView extends GetView<AuthController> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            ChoiceChip(
-                              label: Text('contractor'.tr()),
-                              selected:
-                                  controller.selectedRole.value == 'contractor',
-                              selectedColor: primaryColor,
-                              labelStyle: TextStyle(
-                                color:
+                            Expanded(
+                              child: ChoiceChip(
+                                label: Center(child: Text('contractor'.tr())),
+                                selected:
                                     controller.selectedRole.value ==
-                                        'contractor'
-                                    ? Colors.white
-                                    : Get.theme.textTheme.bodyMedium!.color,
+                                    'contractor',
+                                selectedColor: primaryColor,
+                                labelStyle: TextStyle(
+                                  fontFamily: 'NotoKufiArabic',
+                                  color:
+                                      controller.selectedRole.value ==
+                                          'contractor'
+                                      ? Colors.white
+                                      : Colors.blueGrey,
+                                ),
+                                onSelected: (selected) {
+                                  if (selected)
+                                    controller.selectRole('contractor');
+                                },
                               ),
-                              onSelected: (selected) {
-                                if (selected)
-                                  controller.selectRole('contractor');
-                              },
                             ),
                             const SizedBox(width: 8),
-                            ChoiceChip(
-                              label: Text('project_owner'.tr()),
-                              selected:
-                                  controller.selectedRole.value ==
-                                  'project_owner',
-                              selectedColor: primaryColor,
-                              labelStyle: TextStyle(
-                                color:
+                            Expanded(
+                              child: ChoiceChip(
+                                label: Center(
+                                  child: Text('project_owner'.tr()),
+                                ),
+                                selected:
                                     controller.selectedRole.value ==
-                                        'project_owner'
-                                    ? Colors.white
-                                    : Get.theme.textTheme.bodyMedium!.color,
+                                    'project_owner',
+                                selectedColor: primaryColor,
+                                labelStyle: TextStyle(
+                                  fontFamily: 'NotoKufiArabic',
+                                  color:
+                                      controller.selectedRole.value ==
+                                          'project_owner'
+                                      ? Colors.white
+                                      : Colors.blueGrey,
+                                ),
+                                onSelected: (selected) {
+                                  if (selected)
+                                    controller.selectRole('project_owner');
+                                },
                               ),
-                              onSelected: (selected) {
-                                if (selected)
-                                  controller.selectRole('project_owner');
-                              },
                             ),
                           ],
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'email'.tr(),
-                            border: const OutlineInputBorder(),
-                            prefixIcon: const Icon(Icons.email),
-                          ),
+                        CustomTextField(
+                          controller: emailController,
+                          labelText: 'email'.tr(),
+                          prefixIcon: Icons.email,
                           keyboardType: TextInputType.emailAddress,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'please_enter_email'.tr();
-                            }
-                            if (!GetUtils.isEmail(value)) {
-                              return 'invalid_email'.tr();
-                            }
-                            return null;
-                          },
-                          onChanged: (value) => controller.email.value = value,
+                          validator: (value) => validate(value, 'email'),
+                          onChanged: (value) => validate(value, 'email'),
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'phone'.tr(),
-                            border: const OutlineInputBorder(),
-                            prefixIcon: const Icon(Icons.phone),
-                          ),
+                        CustomTextField(
+                          controller: phoneController,
+                          labelText: 'phone'.tr(),
+                          prefixIcon: Icons.phone,
                           keyboardType: TextInputType.phone,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'please_enter_phone'.tr();
-                            }
-                            return null;
-                          },
-                          onChanged: (value) => controller.phone.value = value,
+                          validator: (value) => validate(value, 'phone'),
+                          onChanged: (value) => validate(value, 'phone'),
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'password'.tr(),
-                            border: const OutlineInputBorder(),
-                            prefixIcon: const Icon(Icons.lock),
-                          ),
+                        CustomTextField(
+                          controller: passwordController,
+                          labelText: 'password'.tr(),
+                          prefixIcon: Icons.lock,
                           obscureText: true,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'please_enter_password'.tr();
-                            }
-                            if (value.length < 6) {
-                              return 'password_too_short'.tr();
-                            }
-                            return null;
-                          },
+                          validator: (value) => validate(value, 'password'),
+                          onChanged: (value) => validate(value, 'password'),
+                        ),
+                        const SizedBox(height: 16),
+                        CustomTextField(
+                          controller: confirmPasswordController,
+                          labelText: 'confirm_password'.tr(),
+                          prefixIcon: Icons.lock,
+                          obscureText: true,
+                          validator: (value) =>
+                              validate(value, 'confirm_password'),
                           onChanged: (value) =>
-                              controller.password.value = value,
+                              validate(value, 'confirm_password'),
                         ),
                       ] else if (controller.selectedRole.value ==
                           'contractor') ...[
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'name'.tr(),
-                            border: const OutlineInputBorder(),
-                            prefixIcon: const Icon(Icons.person),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'please_enter_name'.tr();
-                            }
-                            return null;
-                          },
-                          onChanged: (value) => controller.name.value = value,
+                        CustomTextField(
+                          controller: nameController,
+                          labelText: 'name'.tr(),
+                          prefixIcon: Icons.person,
+                          validator: (value) => validate(value, 'name'),
+                          onChanged: (value) => validate(value, 'name'),
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'prename'.tr(),
-                            border: const OutlineInputBorder(),
-                            prefixIcon: const Icon(Icons.person),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'please_enter_prename'.tr();
-                            }
-                            return null;
-                          },
-                          onChanged: (value) =>
-                              controller.prename.value = value,
+                        CustomTextField(
+                          controller: prenameController,
+                          labelText: 'prename'.tr(),
+                          prefixIcon: Icons.person,
+                          validator: (value) => validate(value, 'prename'),
+                          onChanged: (value) => validate(value, 'prename'),
                         ),
                         const SizedBox(height: 16),
-                        DropdownButtonFormField<String>(
-                          decoration: InputDecoration(
-                            labelText: 'wilaya'.tr(),
-                            border: const OutlineInputBorder(),
+                        CustomTextField(
+                          controller: wilayaController,
+                          labelText: 'wilaya'.tr(),
+                          prefixIcon: Icons.location_city,
+                          isDropdown: true,
+                          onTap: () => _showSelectionDialog(
+                            context,
+                            wilayas,
+                            'wilaya',
+                            (value) {
+                              wilayaController.text = value;
+                              controller.wilaya.value = value;
+                              controller.wilaya.refresh();
+                            },
                           ),
-                          items: wilayas
-                              .map(
-                                (wilaya) => DropdownMenuItem(
-                                  value: wilaya,
-                                  child: Text(
-                                    wilaya,
-                                    style: const TextStyle(
-                                      fontFamily: 'NotoKufiArabic',
-                                    ),
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (value) =>
-                              controller.wilaya.value = value ?? '',
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'please_select_wilaya'.tr();
-                            }
-                            return null;
-                          },
+                          validator: (value) => validate(value, 'wilaya'),
                         ),
                         const SizedBox(height: 16),
-                        DropdownButtonFormField<String>(
-                          decoration: InputDecoration(
-                            labelText: 'activity_sector'.tr(),
-                            border: const OutlineInputBorder(),
+                        CustomTextField(
+                          controller: activitySectorController,
+                          labelText: 'activity_sector'.tr(),
+                          prefixIcon: Icons.work,
+                          isDropdown: true,
+                          onTap: () => _showSelectionDialog(
+                            context,
+                            activitySectors,
+                            'activity_sector',
+                            (value) {
+                              activitySectorController.text = value;
+                              controller.activitySector.value = value;
+                              controller.activitySector.refresh();
+                            },
                           ),
-                          items: activitySectors
-                              .map(
-                                (sector) => DropdownMenuItem(
-                                  value: sector,
-                                  child: Text(
-                                    sector,
-                                    style: const TextStyle(
-                                      fontFamily: 'NotoKufiArabic',
-                                    ),
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (value) =>
-                              controller.activitySector.value = value ?? '',
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'please_select_activity_sector'.tr();
-                            }
-                            return null;
-                          },
+                          validator: (value) =>
+                              validate(value, 'activity_sector'),
                         ),
                       ] else ...[
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'company_name'.tr(),
-                            border: const OutlineInputBorder(),
-                            prefixIcon: const Icon(Icons.business),
-                          ),
-                          onChanged: (value) =>
-                              controller.companyName.value = value,
+                        CustomTextField(
+                          controller: companyNameController,
+                          labelText: 'company_name'.tr(),
+                          prefixIcon: Icons.business,
+                          validator: (value) => validate(value, 'company_name'),
+                          onChanged: (value) => validate(value, 'company_name'),
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'company_address'.tr(),
-                            border: const OutlineInputBorder(),
-                            prefixIcon: const Icon(Icons.location_on),
-                          ),
+                        CustomTextField(
+                          controller: companyAddressController,
+                          labelText: 'company_address'.tr(),
+                          prefixIcon: Icons.location_on,
+                          validator: (value) =>
+                              validate(value, 'company_address'),
                           onChanged: (value) =>
-                              controller.companyAddress.value = value,
+                              validate(value, 'company_address'),
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'company_phone'.tr(),
-                            border: const OutlineInputBorder(),
-                            prefixIcon: const Icon(Icons.phone),
-                          ),
+                        CustomTextField(
+                          controller: companyPhoneController,
+                          labelText: 'company_phone'.tr(),
+                          prefixIcon: Icons.phone,
                           keyboardType: TextInputType.phone,
+                          validator: (value) =>
+                              validate(value, 'company_phone'),
                           onChanged: (value) =>
-                              controller.companyPhone.value = value,
+                              validate(value, 'company_phone'),
                         ),
                       ],
                       const SizedBox(height: 24),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: controller.currentStep.value != 1
+                            ? MainAxisAlignment.spaceBetween
+                            : MainAxisAlignment.center,
                         children: [
                           if (controller.currentStep.value > 1)
                             TextButton(
@@ -346,51 +381,69 @@ class SignUpView extends GetView<AuthController> {
                                 ),
                               ),
                             ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 16,
-                                horizontal: 24,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                          CustomButton(
+                            text: controller.currentStep.value == 1
+                                ? 'next'.tr()
+                                : 'signup'.tr(),
+                            trailingIcon: controller.currentStep.value == 1
+                                ? Icons.arrow_forward
+                                : Icons.person_add,
+                            backgroundColor: primaryColor,
+                            textColor: Colors.white,
+                            iconColor: Colors.white,
+                            fixedSize: controller.currentStep.value != 1
+                                ? Size(50.w, 8.h)
+                                : Size(70.w, 8.h),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal: 24,
                             ),
+                            borderRadius: 8,
                             onPressed: () {
                               if (formKey.currentState!.validate()) {
                                 if (controller.currentStep.value == 1) {
+                                  controller.email.value = emailController.text;
+                                  controller.phone.value = phoneController.text;
+                                  controller.password.value =
+                                      passwordController.text;
+                                  controller.confirmPassword.value =
+                                      confirmPasswordController.text;
                                   controller.nextStep();
                                 } else {
                                   if (controller.selectedRole.value ==
-                                          'contractor' &&
-                                      (controller.name.value.isEmpty ||
-                                          controller.prename.value.isEmpty ||
-                                          controller.wilaya.value.isEmpty ||
-                                          controller
-                                              .activitySector
-                                              .value
-                                              .isEmpty)) {
-                                    Get.snackbar(
-                                      'خطأ'.tr(),
-                                      'please_fill_all_fields'.tr(),
-                                    );
-                                    return;
+                                      'contractor') {
+                                    controller.name.value = nameController.text;
+                                    controller.prename.value =
+                                        prenameController.text;
+                                    controller.wilaya.value =
+                                        wilayaController.text;
+                                    controller.activitySector.value =
+                                        activitySectorController.text;
+                                    if (controller.name.value.isEmpty ||
+                                        controller.prename.value.isEmpty ||
+                                        controller.wilaya.value.isEmpty ||
+                                        controller
+                                            .activitySector
+                                            .value
+                                            .isEmpty) {
+                                      Get.snackbar(
+                                        'error'.tr(),
+                                        'please_fill_all_fields'.tr(),
+                                      );
+                                      return;
+                                    }
+                                  } else {
+                                    controller.companyName.value =
+                                        companyNameController.text;
+                                    controller.companyAddress.value =
+                                        companyAddressController.text;
+                                    controller.companyPhone.value =
+                                        companyPhoneController.text;
                                   }
                                   controller.signUp();
                                 }
                               }
                             },
-                            child: Text(
-                              controller.currentStep.value == 1
-                                  ? 'next'.tr()
-                                  : 'signup'.tr(),
-                              style: const TextStyle(
-                                fontFamily: 'NotoKufiArabic',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
                           ),
                         ],
                       ),
@@ -412,6 +465,51 @@ class SignUpView extends GetView<AuthController> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _showSelectionDialog(
+    BuildContext context,
+    List<String> items,
+    String titleKey,
+    Function(String) onSelected,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          titleKey.tr(),
+          style: const TextStyle(fontFamily: 'NotoKufiArabic'),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: items
+                .map(
+                  (item) => ListTile(
+                    title: Text(
+                      item,
+                      style: const TextStyle(fontFamily: 'NotoKufiArabic'),
+                    ),
+                    onTap: () {
+                      onSelected(item);
+                      Get.back();
+                    },
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'cancel'.tr(),
+              style: const TextStyle(fontFamily: 'NotoKufiArabic'),
+            ),
+          ),
+        ],
       ),
     );
   }

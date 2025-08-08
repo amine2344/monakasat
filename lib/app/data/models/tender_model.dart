@@ -1,45 +1,58 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class TenderModel {
   final String id;
-  final String title;
-  final String category;
-  final String wilaya;
-  final String date;
-  final String announcer;
-  final bool isRestricted;
+  final String userId;
+  final String projectName;
+  final String serviceType;
+  final String requirements;
+  final double budget;
+  final String legalRequirements;
+  final DateTime startDate;
+  final DateTime endDate;
+  final DateTime createdAt;
+  final String? documentName;
+  final String stage;
+  final String? wilaya;
+  final String? announcer;
 
   TenderModel({
     required this.id,
-    required this.title,
-    required this.category,
-    required this.wilaya,
-    required this.date,
-    required this.announcer,
-    required this.isRestricted,
+    required this.userId,
+    required this.projectName,
+    required this.serviceType,
+    required this.requirements,
+    required this.budget,
+    required this.legalRequirements,
+    required this.startDate,
+    required this.endDate,
+    required this.createdAt,
+    this.documentName,
+    required this.stage,
+    this.wilaya,
+    this.announcer,
   });
 
-  factory TenderModel.fromJson(Map<String, dynamic> json) {
+  factory TenderModel.fromJson(Map<String, dynamic> json, String id) {
     return TenderModel(
-      id: json['id'] ?? '',
-      title: json['title'] ?? '',
-      category: json['category'] ?? '',
-      wilaya: json['wilaya'] ?? '',
-      date: json['date'] ?? '',
-      announcer: json['announcer'] ?? '',
-      isRestricted: json['isRestricted'] ?? false,
+      id: id,
+      userId: json['userId'] ?? '',
+      projectName: json['projectName'] ?? '',
+      serviceType: json['serviceType'] ?? '',
+      requirements: json['requirements'] ?? '',
+      budget: (json['budget'] ?? 0.0).toDouble(),
+      legalRequirements: json['legalRequirements'] ?? '',
+      startDate: DateTime.parse(
+        json['startDate']?.toDate().toString() ?? DateTime.now().toString(),
+      ),
+      endDate: DateTime.parse(
+        json['endDate']?.toDate().toString() ?? DateTime.now().toString(),
+      ),
+      createdAt: DateTime.parse(
+        json['createdAt']?.toDate().toString() ?? DateTime.now().toString(),
+      ),
+      documentName: json['documentName'],
+      stage: json['stage'] ?? 'planning',
+      wilaya: json['wilaya'],
+      announcer: json['announcer'],
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'category': category,
-      'wilaya': wilaya,
-      'date': date,
-      'announcer': announcer,
-      'isRestricted': isRestricted,
-    };
   }
 }

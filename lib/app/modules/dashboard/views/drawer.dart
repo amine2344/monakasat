@@ -1,12 +1,17 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
+import 'package:mounakassat_dz/app/modules/auth/controllers/auth_controller.dart';
+import 'package:mounakassat_dz/app/routes/app_pages.dart';
 import '../../../../utils/theme_config.dart';
+import '../../../data/services/firebase_service.dart';
 import '../controllers/dashboard_controller.dart';
 
 class CustomDrawer extends StatelessWidget {
   final DashboardController controller = Get.find();
-
+  final AuthController authController = AuthController();
+  final FirebaseService firebaseService = FirebaseService();
   CustomDrawer({super.key});
 
   @override
@@ -40,17 +45,7 @@ class CustomDrawer extends StatelessWidget {
               Get.back();
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.dashboard),
-            title: Text(
-              'dashboard'.tr(),
-              style: const TextStyle(fontFamily: 'NotoKufiArabic'),
-            ),
-            onTap: () {
-              controller.changeTab(1);
-              Get.back();
-            },
-          ),
+
           ListTile(
             leading: const Icon(Icons.local_offer),
             title: Text(
@@ -69,8 +64,8 @@ class CustomDrawer extends StatelessWidget {
               style: const TextStyle(fontFamily: 'NotoKufiArabic'),
             ),
             onTap: () {
-              controller.changeTab(3);
               Get.back();
+              Get.toNamed(Routes.SETTINGS);
             },
           ),
           const Divider(),
@@ -84,16 +79,32 @@ class CustomDrawer extends StatelessWidget {
               Get.toNamed('/subscription');
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.login),
-            title: const Text(
-              'تسجيل الدخول',
-              style: TextStyle(fontFamily: 'NotoKufiArabic'),
-            ),
-            onTap: () {
-              Get.toNamed('/auth');
-            },
-          ),
+          (firebaseService.auth.currentUser == null)
+              ? ListTile(
+                  leading: const Icon(Icons.login),
+                  title: controller.isLoading.value
+                      ? CupertinoActivityIndicator(color: primaryColor)
+                      : const Text(
+                          'تسجيل الدخول',
+                          style: TextStyle(fontFamily: 'NotoKufiArabic'),
+                        ),
+                  onTap: () {
+                    Get.toNamed(Routes.AUTH);
+                  },
+                )
+              : ListTile(
+                  leading: const Icon(Icons.login),
+                  title: controller.isLoading.value
+                      ? CupertinoActivityIndicator(color: primaryColor)
+                      : Text(
+                          'logout'.tr(),
+                          style: TextStyle(fontFamily: 'NotoKufiArabic'),
+                        ),
+                  onTap: () async {
+                    await authController.firebaseService.signOut();
+                    Get.offAllNamed(Routes.DASHBOARD);
+                  },
+                ),
           /* ListTile(
             leading: const Icon(Icons.person_add),
             title: const Text(

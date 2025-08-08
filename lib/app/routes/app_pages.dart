@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:mounakassat_dz/app/modules/auth/views/signup_view.dart';
 
 import '../modules/announce/bindings/announce_binding.dart';
 import '../modules/announce/views/announce_view.dart';
@@ -7,6 +6,7 @@ import '../modules/approve_contract/bindings/approve_contract_binding.dart';
 import '../modules/approve_contract/views/approve_contract_view.dart';
 import '../modules/auth/bindings/auth_binding.dart';
 import '../modules/auth/views/login_view.dart';
+import '../modules/auth/views/signup_view.dart';
 import '../modules/dashboard/bindings/dashboard_binding.dart';
 import '../modules/dashboard/views/dashboard_view.dart';
 import '../modules/evaluate_offers/bindings/evaluate_offers_binding.dart';
@@ -19,6 +19,8 @@ import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/my_offers/bindings/my_offers_binding.dart';
 import '../modules/my_offers/views/my_offers_view.dart';
+import '../modules/notifications/bindings/notifications_binding.dart';
+import '../modules/notifications/views/notifications_view.dart';
 import '../modules/open_envloppes/bindings/open_envloppes_binding.dart';
 import '../modules/open_envloppes/views/open_envloppes_view.dart';
 import '../modules/planning/bindings/planning_binding.dart';
@@ -126,6 +128,11 @@ class AppPages {
       name: _Paths.FINAL_DELIVERY,
       page: () => const FinalDeliveryView(),
       binding: FinalDeliveryBinding(),
+    ),
+    GetPage(
+      name: _Paths.NOTIFICATIONS,
+      page: () => const NotificationsView(),
+      binding: NotificationsBinding(),
     ),
   ];
 }

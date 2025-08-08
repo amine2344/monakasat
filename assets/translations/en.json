@@ -4,7 +4,22 @@
   "dashboard": "Dashboard",
   "my_offers": "My Offers",
   "settings": "Settings",
-  "language": "Language",
+  "profile": "Profile",
+  "language": "Language",  "guest_user": "Guest User"
+,"planning_stage": "Planning and Needs Assessment",
+  "enter_project_details": "Enter project details",
+  "requirements": "Requirements",
+  
+  "save_data": "Save Data",
+  "construction": "Construction",
+  "it_services": "IT Services",
+  "consulting": "Consulting",
+  "supply": "Supply",
+  "error": "Error",
+  "success": "Success",
+  "user_not_logged_in": "User not logged in",
+  "project_details_saved": "Project details saved successfully",
+  "failed_to_save_project": "Failed to save project details",
   "theme": "Theme",
   "light_mode": "Light Mode",
   "dark_mode": "Dark Mode",
@@ -83,5 +98,53 @@
   "previous": "Previous",
   "login_failed": "Login failed",
   "signup_failed": "Sign-up failed",
-  "role_mismatch": "Selected role does not match your account"
+  "role_mismatch": "Selected role does not match your account",
+   "my_tenders": "My Tenders",
+  "available_tenders": "Available Tenders",
+  "no_offers_available": "No tenders or offers available",
+  "category": "Category: %s",
+  
+  "date": "Date: %s",
+  "stage": "Stage: %s",
+  "offers_received": "Offers Received: %s",
+  "offer_status": "Offer Status: %s",
+  
+  "tender_announcement": "Tender Announcement",
+  "offer_submission": "Offer Submission",
+  "opening_envelopes": "Opening Envelopes",
+  "offer_evaluation": "Offer Evaluation",
+  "contract_approval": "Contract Approval",
+  "execution_monitoring": "Execution and Monitoring",
+  
+  "unknown_stage": "Unknown Stage",
+  "confirm_password": "Confirm Password",
+  
+  "please_confirm_password": "Please confirm password",
+  "passwords_do_not_match": "Passwords do not match",
+  
+  "cancel": "Cancel","notifications": "Notifications",
+  "role": "Role",
+  "please_enter_project_name": "Please enter project name",
+  "please_enter_service_type": "Please enter service type",
+  "please_select_service_type": "Please select service type",
+  "please_enter_requirements": "Please enter requirements",
+  "please_enter_budget": "Please enter budget",
+  "invalid_budget": "Invalid budget",
+  
+  "project_saved": "Project saved",
+  "save_project_failed": "Failed to save project",
+  "user_not_authenticated": "User not authenticated",
+  "edit_project": "Edit Project",
+  "edit_project_details": "Edit project details",
+  "project_updated": "Project updated",
+  "update_project_failed": "Failed to update project",
+  
+  "please_enter_legal_requirements": "Please enter legal requirements",
+  
+  "please_select_dates": "Please select start and end dates",
+  "end_date_before_start": "End date is before start date",
+  "tender_published": "Tender published",
+  "publish_tender_failed": "Failed to publish tender",
+  "add_project": "Add Project",
+  "project_planning": "Project Planning"
 }

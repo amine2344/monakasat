@@ -20,6 +20,7 @@ abstract class Routes {
   static const APPROVE_CONTRACT = _Paths.APPROVE_CONTRACT;
   static const EXECUTION = _Paths.EXECUTION;
   static const FINAL_DELIVERY = _Paths.FINAL_DELIVERY;
+  static const NOTIFICATIONS = _Paths.NOTIFICATIONS;
 }
 
 abstract class _Paths {
@@ -42,4 +43,5 @@ abstract class _Paths {
   static const APPROVE_CONTRACT = '/approve-contract';
   static const EXECUTION = '/execution';
   static const FINAL_DELIVERY = '/final-delivery';
+  static const NOTIFICATIONS = '/notifications';
 }

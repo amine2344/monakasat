@@ -77,13 +77,13 @@ class SearchView extends GetView<SearchController> {
                     return Card(
                       margin: const EdgeInsets.symmetric(vertical: 8.0),
                       child: ListTile(
-                        title: Text(tender.title),
+                        title: Text(tender.projectName),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('القطاع: ${tender.category}'),
+                            /* Text('القطاع: ${tender.category}'),
                             Text('الولاية: ${tender.wilaya}'),
-                            Text('التاريخ: ${tender.date}'),
+                            Text('التاريخ: ${tender.date}'), */
                           ],
                         ),
                       ),
