@@ -1,12 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
-import '../../../data/models/tender_model.dart';
 import '../../../data/services/firebase_service.dart';
+import '../../../data/models/tender_model.dart';
 import '../../auth/controllers/auth_controller.dart';
 
 class MyOffersController extends GetxController {
-  final FirebaseService _firebaseService = Get.find<FirebaseService>();
-  final AuthController _authController = Get.find<AuthController>();
+  final FirebaseService firebaseService = Get.find<FirebaseService>();
+  final AuthController authController = Get.find<AuthController>();
   var myOffers = <TenderModel>[].obs;
   var isLoading = true.obs;
 
@@ -16,67 +18,64 @@ class MyOffersController extends GetxController {
     fetchMyOffers();
   }
 
-  void fetchMyOffers() {
-    final user = _firebaseService.auth.currentUser;
-    if (user == null) {
-      isLoading.value = false;
-      return;
-    }
-
-    final isProjectOwner =
-        _authController.selectedRole.value == 'project_owner';
-    _firebaseService.getTenders().listen((tenderList) {
-      /* myOffers.assignAll(
-        isProjectOwner
-            ? tenderList
-                  .where((tender) => tender.announcer == user.email)
-                  .toList()
-            : tenderList.where((tender) {
-                final offers = tender. ?? [];
-                return tender.isOpen ||
-                    offers.any((offer) => offer['contractorId'] == user.uid);
-              }).toList(),
-      ); */
-      isLoading.value = false;
-    });
-  }
-
-  void trackInteraction(String tenderId, String action) async {
-    final user = _firebaseService.auth.currentUser;
-    if (user == null) return;
-
+  Future<void> fetchMyOffers() async {
     try {
-      await _firebaseService.firestore.collection('interactions').add({
-        'userId': user.uid,
-        'tenderId': tenderId,
-        'action': action,
-        'timestamp': DateTime.now(),
-      });
+      isLoading.value = true;
+      final userId = firebaseService.auth.currentUser?.uid;
+      if (userId == null) {
+        Get.snackbar('error'.tr(), 'user_not_authenticated'.tr());
+        return;
+      }
+
+      final isProjectOwner =
+          authController.selectedRole.value == 'project_owner';
+      QuerySnapshot querySnapshot;
+
+      if (isProjectOwner) {
+        querySnapshot = await firebaseService.firestore
+            .collection('projects')
+            .where('userId', isEqualTo: userId)
+            .get();
+      } else {
+        querySnapshot = await firebaseService.firestore
+            .collection('projects')
+            .where(
+              'offers',
+              arrayContainsAny: [
+                {'contractorId': userId},
+              ],
+            )
+            .get();
+      }
+
+      myOffers.value = querySnapshot.docs
+          .map(
+            (doc) => TenderModel.fromJson(
+              doc.data() as Map<String, dynamic>,
+              doc.id,
+            ),
+          )
+          .toList();
+      debugPrint('Fetched ${myOffers.length} offers');
     } catch (e) {
-      print('Error tracking interaction: $e');
+      debugPrint('Error fetching offers: $e');
+      Get.snackbar('error'.tr(), 'no_offers_available'.tr());
+    } finally {
+      isLoading.value = false;
     }
   }
 
   String getStageText(String stage) {
     switch (stage) {
-      case 'planning':
-        return 'planning_stage'.tr();
-      case 'announcement':
-        return 'tender_announcement'.tr();
-      case 'submission':
-        return 'offer_submission'.tr();
-      case 'opening':
-        return 'opening_envelopes'.tr();
-      case 'evaluation':
-        return 'offer_evaluation'.tr();
-      case 'approval':
-        return 'contract_approval'.tr();
-      case 'execution':
-        return 'execution_monitoring'.tr();
-      case 'delivery':
-        return 'final_delivery'.tr();
+      case 'announced':
+        return 'pending'.tr();
       default:
-        return 'unknown_stage'.tr();
+        return stage;
     }
+  }
+
+  void trackInteraction(String tenderId, String action) {
+    debugPrint('Tracked interaction: $action for tender $tenderId');
+    // Implement analytics if needed
   }
 }

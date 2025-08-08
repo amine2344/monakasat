@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:sizer/sizer.dart';
 import 'package:mounakassat_dz/app/widgets/custom_appbar.dart';
 import 'package:mounakassat_dz/app/widgets/custom_button.dart';
-
 import '../../../../utils/theme_config.dart';
 import '../../../controllers/theme_controller.dart';
 import '../../../widgets/custom_textfield.dart';
@@ -62,33 +62,8 @@ class PlanningView extends GetView<PlanningController> {
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
-    final projectNameController = TextEditingController();
-    final serviceTypeController = TextEditingController();
-    final requirementsController = TextEditingController();
-    final budgetController = TextEditingController();
     final projectId = Get.arguments?['projectId'] as String?;
     final isEditing = projectId != null;
-
-    // If editing, populate fields with existing data
-    if (isEditing) {
-      ever(controller.isLoading, (_) {
-        if (!controller.isLoading.value) {
-          controller.firebaseService.firestore
-              .collection('projects')
-              .doc(projectId)
-              .get()
-              .then((doc) {
-                if (doc.exists) {
-                  final data = doc.data()!;
-                  projectNameController.text = data['projectName'] ?? '';
-                  serviceTypeController.text = data['serviceType'] ?? '';
-                  requirementsController.text = data['requirements'] ?? '';
-                  budgetController.text = data['budget']?.toString() ?? '';
-                }
-              });
-        }
-      });
-    }
 
     return Scaffold(
       backgroundColor: Get.theme.scaffoldBackgroundColor,
@@ -121,11 +96,9 @@ class PlanningView extends GetView<PlanningController> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        controller.currentStep.value == 1
-                            ? (isEditing
-                                  ? 'edit_project_details'.tr()
-                                  : 'enter_project_details'.tr())
-                            : 'announce_tender'.tr(),
+                        isEditing
+                            ? 'edit_project_details'.tr()
+                            : 'enter_project_details'.tr(),
                         style: const TextStyle(
                           fontFamily: 'NotoKufiArabic',
                           fontSize: 24,
@@ -134,127 +107,260 @@ class PlanningView extends GetView<PlanningController> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
-                      if (controller.currentStep.value == 1) ...[
-                        CustomTextField(
-                          controller: projectNameController,
-                          labelText: 'project_name'.tr(),
-                          prefixIcon: Icons.description,
-                          validator: (value) {
-                            if (value == null || value.isEmpty)
-                              return 'please_enter_project_name'.tr();
-                            return null;
-                          },
+                      CustomTextField(
+                        controller: controller.projectNameController,
+                        labelText: 'project_name'.tr(),
+                        prefixIcon: Icons.description,
+                        validator: (value) {
+                          if (value == null || value.isEmpty)
+                            return 'please_enter_project_name'.tr();
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextField(
+                        controller: controller.serviceTypeController,
+                        labelText: 'service_type'.tr(),
+                        prefixIcon: Icons.category,
+                        isDropdown: true,
+                        onTap: () => _showSelectionDialog(
+                          context,
+                          SignUpView.activitySectors,
+                          'service_type',
+                          (value) =>
+                              controller.serviceTypeController.text = value,
                         ),
-                        const SizedBox(height: 16),
-                        CustomTextField(
-                          controller: serviceTypeController,
-                          labelText: 'service_type'.tr(),
-                          prefixIcon: Icons.category,
-                          isDropdown: true,
-                          onTap: () => _showSelectionDialog(
-                            context,
-                            SignUpView.activitySectors,
-                            'service_type',
-                            (value) => serviceTypeController.text = value,
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty)
-                              return 'please_select_service_type'.tr();
-                            return null;
-                          },
+                        validator: (value) {
+                          if (value == null || value.isEmpty)
+                            return 'please_select_service_type'.tr();
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextField(
+                        controller: controller.categoryController,
+                        labelText: 'category'.tr(),
+                        prefixIcon: Icons.label,
+                        isDropdown: true,
+                        onTap: () => _showSelectionDialog(
+                          context,
+                          [
+                            'Construction',
+                            'IT',
+                            'Consulting',
+                          ], // Replace with your categories
+                          'category',
+                          (value) => controller.categoryController.text = value,
                         ),
-                        const SizedBox(height: 16),
-                        CustomTextField(
-                          controller: requirementsController,
-                          labelText: 'requirements'.tr(),
-                          prefixIcon: Icons.list,
-                          maxLines: 4,
-                          validator: (value) {
-                            if (value == null || value.isEmpty)
-                              return 'please_enter_requirements'.tr();
-                            return null;
-                          },
+                        validator: (value) {
+                          if (value == null || value.isEmpty)
+                            return 'please_select_category'.tr();
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextField(
+                        controller: controller.wilayaController,
+                        labelText: 'wilaya'.tr(),
+                        prefixIcon: Icons.location_on,
+                        isDropdown: true,
+                        onTap: () => _showSelectionDialog(
+                          context,
+                          [
+                            'Algiers',
+                            'Oran',
+                            'Constantine',
+                          ], // Replace with your wilayas
+                          'wilaya',
+                          (value) => controller.wilayaController.text = value,
                         ),
-                        const SizedBox(height: 16),
-                        CustomTextField(
-                          controller: budgetController,
-                          labelText: 'budget'.tr(),
-                          prefixIcon: Icons.attach_money,
-                          keyboardType: TextInputType.number,
-                          validator: (value) {
-                            if (value == null || value.isEmpty)
-                              return 'please_enter_budget'.tr();
-                            if (double.tryParse(value) == null ||
-                                double.parse(value) <= 0) {
-                              return 'invalid_budget'.tr();
-                            }
-                            return null;
-                          },
-                        ),
-                      ],
-                      const SizedBox(height: 24),
+                        validator: (value) {
+                          if (value == null || value.isEmpty)
+                            return 'please_select_wilaya'.tr();
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextField(
+                        controller: controller.requirementsController,
+                        labelText: 'requirements'.tr(),
+                        prefixIcon: Icons.list,
+                        maxLines: 4,
+                        validator: (value) {
+                          if (value == null || value.isEmpty)
+                            return 'please_enter_requirements'.tr();
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextField(
+                        controller: controller.budgetController,
+                        labelText: 'budget'.tr(),
+                        prefixIcon: Icons.attach_money,
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty)
+                            return 'please_enter_budget'.tr();
+                          if (double.tryParse(value) == null ||
+                              double.parse(value) <= 0) {
+                            return 'invalid_budget'.tr();
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextField(
+                        controller: controller.legalRequirementsController,
+                        labelText: 'legal_requirements'.tr(),
+                        prefixIcon: Icons.gavel,
+                        maxLines: 4,
+                        validator: (value) {
+                          return null; // Optional field
+                        },
+                      ),
+                      const SizedBox(height: 16),
                       Row(
-                        mainAxisAlignment: controller.currentStep.value == 1
-                            ? MainAxisAlignment.center
-                            : MainAxisAlignment.spaceBetween,
                         children: [
-                          if (controller.currentStep.value == 2)
-                            TextButton(
-                              onPressed: controller.previousStep,
-                              child: Text(
-                                'previous'.tr(),
-                                style: const TextStyle(
-                                  fontFamily: 'NotoKufiArabic',
-                                  color: primaryColor,
-                                ),
-                              ),
-                            ),
                           CustomButton(
-                            text: controller.currentStep.value == 1
-                                ? 'next'.tr()
-                                : 'publish'.tr(),
-                            trailingIcon: controller.currentStep.value == 1
-                                ? Icons.arrow_forward
-                                : Icons.send,
+                            text: 'upload_documents'.tr(),
+                            trailingIcon: Icons.upload_file,
                             backgroundColor: primaryColor,
                             textColor: Colors.white,
                             iconColor: Colors.white,
-                            fixedSize: controller.currentStep.value == 1
-                                ? Size(70.w, 8.h)
-                                : Size(50.w, 8.h),
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                              horizontal: 24,
-                            ),
-                            borderRadius: 8,
-                            onPressed: () {
-                              if (formKey.currentState!.validate()) {
-                                if (controller.currentStep.value == 1) {
-                                  if (isEditing) {
-                                    controller.updateProjectDetails(
-                                      projectId: projectId!,
-                                      projectName: projectNameController.text,
-                                      serviceType: serviceTypeController.text,
-                                      requirements: requirementsController.text,
-                                      budget: double.parse(
-                                        budgetController.text,
-                                      ),
-                                    );
-                                  } else {
-                                    controller.saveProjectDetails(
-                                      projectName: projectNameController.text,
-                                      serviceType: serviceTypeController.text,
-                                      requirements: requirementsController.text,
-                                      budget: double.parse(
-                                        budgetController.text,
-                                      ),
-                                    );
-                                  }
-                                }
+                            fixedSize: Size(50.w, 6.h),
+                            onPressed: () async {
+                              final result = await FilePicker.platform
+                                  .pickFiles(
+                                    type: FileType.custom,
+                                    allowedExtensions: [
+                                      'jpg',
+                                      'jpeg',
+                                      'png',
+                                      'pdf',
+                                    ],
+                                  );
+                              if (result != null) {
+                                controller.selectedFile.value = result;
                               }
                             },
                           ),
+                          SizedBox(width: 2.w),
+                          Obx(
+                            () => controller.selectedFile.value != null
+                                ? Flexible(
+                                    child: Text(
+                                      controller
+                                          .selectedFile
+                                          .value!
+                                          .files
+                                          .single
+                                          .name,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontFamily: 'NotoKufiArabic',
+                                      ),
+                                    ),
+                                  )
+                                : Container(),
+                          ),
                         ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          CustomButton(
+                            text: 'start_date'.tr(),
+                            trailingIcon: Icons.calendar_today,
+                            backgroundColor: primaryColor,
+                            textColor: Colors.white,
+                            iconColor: Colors.white,
+                            fixedSize: Size(50.w, 6.h),
+                            onPressed: () async {
+                              final pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime(2026),
+                              );
+                              if (pickedDate != null) {
+                                controller.setStartDate(pickedDate);
+                              }
+                            },
+                          ),
+                          SizedBox(width: 2.w),
+                          Obx(
+                            () => Text(
+                              controller.startDate.value != null
+                                  ? DateFormat(
+                                      'yyyy-MM-dd',
+                                    ).format(controller.startDate.value!)
+                                  : '',
+                              style: const TextStyle(
+                                fontFamily: 'NotoKufiArabic',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          CustomButton(
+                            text: 'end_date'.tr(),
+                            trailingIcon: Icons.calendar_today,
+                            backgroundColor: primaryColor,
+                            textColor: Colors.white,
+                            iconColor: Colors.white,
+                            fixedSize: Size(50.w, 6.h),
+                            onPressed: () async {
+                              final pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime(2026),
+                              );
+                              if (pickedDate != null) {
+                                controller.setEndDate(pickedDate);
+                              }
+                            },
+                          ),
+                          SizedBox(width: 2.w),
+                          Obx(
+                            () => Text(
+                              controller.endDate.value != null
+                                  ? DateFormat(
+                                      'yyyy-MM-dd',
+                                    ).format(controller.endDate.value!)
+                                  : '',
+                              style: const TextStyle(
+                                fontFamily: 'NotoKufiArabic',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      CustomButton(
+                        text: isEditing ? 'update'.tr() : 'publish'.tr(),
+                        trailingIcon: Icons.send,
+                        backgroundColor: primaryColor,
+                        textColor: Colors.white,
+                        iconColor: Colors.white,
+                        fixedSize: Size(70.w, 8.h),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 24,
+                        ),
+                        borderRadius: 8,
+                        onPressed: controller.isLoading.value
+                            ? null
+                            : () {
+                                if (formKey.currentState!.validate()) {
+                                  controller.announceTender(
+                                    projectId: projectId,
+                                  );
+                                }
+                              },
                       ),
                     ],
                   ),

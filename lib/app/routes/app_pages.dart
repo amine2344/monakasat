@@ -31,17 +31,23 @@ import '../modules/search/bindings/search_binding.dart';
 import '../modules/search/views/search_view.dart';
 import '../modules/settings/bindings/settings_binding.dart';
 import '../modules/settings/views/settings_view.dart';
+import '../modules/splash/bindings/splash_binding.dart';
+import '../modules/splash/views/splash_view.dart';
 import '../modules/submit_offers/bindings/submit_offers_binding.dart';
 import '../modules/submit_offers/views/submit_offers_view.dart';
 import '../modules/subscription/bindings/subscription_binding.dart';
 import '../modules/subscription/views/subscription_view.dart';
+import '../modules/tender_details_contractor/bindings/tender_details_contractor_binding.dart';
+import '../modules/tender_details_contractor/views/tender_details_contractor_view.dart';
+import '../modules/tender_details_owner/bindings/tender_details_owner_binding.dart';
+import '../modules/tender_details_owner/views/tender_details_owner_view.dart';
 
 part 'app_routes.dart';
 
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.DASHBOARD;
+  static const INITIAL = Routes.SPLASH;
 
   static final routes = [
     GetPage(
@@ -131,8 +137,23 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.NOTIFICATIONS,
-      page: () => const NotificationsView(),
+      page: () => const NotificationView(),
       binding: NotificationsBinding(),
+    ),
+    GetPage(
+      name: _Paths.TENDER_DETAILS_OWNER,
+      page: () => const TenderDetailsOwnerView(),
+      binding: TenderDetailsOwnerBinding(),
+    ),
+    GetPage(
+      name: _Paths.TENDER_DETAILS_CONTRACTOR,
+      page: () => const TenderDetailsContractorView(),
+      binding: TenderDetailsContractorBinding(),
+    ),
+    GetPage(
+      name: _Paths.SPLASH,
+      page: () => const SplashView(),
+      binding: SplashBinding(),
     ),
   ];
 }

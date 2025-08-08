@@ -1,5 +1,5 @@
 {
-  "app_title": "Mes Marchés",
+  "app_title": "Safa9ati",
   "home": "Accueil",
   "dashboard": "Tableau de bord",
   "my_offers": "Mes offres",
@@ -150,6 +150,11 @@
   "publish_tender_failed": "Échec de la publication de l'appel d'offres",
 
   "add_project": "Ajouter un projet",
-  "project_planning": "Planification du projet"
+  "project_planning": "Planification du projet",
+  "no_notifications": "No notifications available",
+  "failed_to_save_notification": "Failed to save notification",
+  "failed_to_mark_notification_read": "Failed to mark notification as read",
+  "tender_not_found": "Tender not found",
+  "failed_to_initialize_app": "Failed to initialize app, redirecting to login"
   
 }

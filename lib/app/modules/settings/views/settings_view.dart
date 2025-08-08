@@ -18,103 +18,165 @@ class SettingsView extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(
         titleText: 'settings'.tr(),
-
         automaticallyImplyLeading: true,
         centerTitle: false,
       ),
       body: Directionality(
         textDirection: themeController.textDirection.value,
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'language'.tr(),
-                style: const TextStyle(
-                  fontFamily: 'NotoKufiArabic',
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<Locale>(
-                decoration: InputDecoration(
-                  labelText: 'select_language'.tr(),
-                  border: const OutlineInputBorder(),
-                ),
-                value: context.locale,
-                items: const [Locale('ar'), Locale('fr'), Locale('en')]
-                    .map(
-                      (locale) => DropdownMenuItem(
-                        value: locale,
-                        child: Text(
-                          locale.languageCode == 'ar'
-                              ? 'arabic'.tr()
-                              : locale.languageCode == 'fr'
-                              ? 'french'.tr()
-                              : 'english'.tr(),
-                          style: const TextStyle(fontFamily: 'NotoKufiArabic'),
-                        ),
+              // App Settings Section
+              _buildSectionHeader('app_settings'.tr()),
+              _buildSettingsCard(
+                children: [
+                  _buildSettingsItem(
+                    icon: Icons.language,
+                    title: 'language'.tr(),
+                    trailing: DropdownButton<Locale>(
+                      value: context.locale,
+                      underline: Container(),
+                      items: const [Locale('ar'), Locale('fr'), Locale('en')]
+                          .map(
+                            (locale) => DropdownMenuItem(
+                              value: locale,
+                              child: Text(
+                                locale.languageCode == 'ar'
+                                    ? 'arabic'.tr()
+                                    : locale.languageCode == 'fr'
+                                    ? 'french'.tr()
+                                    : 'english'.tr(),
+                                style: const TextStyle(
+                                  fontFamily: 'NotoKufiArabic',
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (locale) {
+                        if (locale != null) {
+                          themeController.saveLocalePreference(locale);
+                        }
+                      },
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  Obx(
+                    () => _buildSettingsItem(
+                      icon: themeController.isDarkMode.value
+                          ? Icons.dark_mode
+                          : Icons.light_mode,
+                      title: 'theme'.tr(),
+                      trailing: Switch(
+                        value: themeController.isDarkMode.value,
+                        activeColor: primaryColor,
+                        onChanged: (value) {
+                          themeController.toggleTheme();
+                        },
                       ),
-                    )
-                    .toList(),
-                onChanged: (locale) {
-                  if (locale != null) {
-                    themeController.saveLocalePreference(locale);
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'theme'.tr(),
-                style: const TextStyle(
-                  fontFamily: 'NotoKufiArabic',
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Obx(
-                () => SwitchListTile(
-                  title: Text(
-                    themeController.isDarkMode.value
-                        ? 'dark_mode'.tr()
-                        : 'light_mode'.tr(),
-                    style: const TextStyle(fontFamily: 'NotoKufiArabic'),
+                    ),
                   ),
-                  value: themeController.isDarkMode.value,
-                  onChanged: (value) {
-                    themeController.toggleTheme();
-                  },
-                ),
+                ],
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+              const SizedBox(height: 24),
+
+              // Account Section
+              _buildSectionHeader('account'.tr()),
+              _buildSettingsCard(
+                children: [
+                  _buildSettingsItem(
+                    icon: Icons.logout,
+                    title: 'logout'.tr(),
+                    onTap: () async {
+                      await authController.firebaseService.signOut();
+                      Get.offAllNamed('/login');
+                    },
+                    textColor: Colors.red,
+                    iconColor: Colors.red,
                   ),
-                ),
-                onPressed: () async {
-                  await authController.firebaseService.signOut();
-                  Get.offAllNamed('/login');
-                },
-                child: Text(
-                  'logout'.tr(),
-                  style: const TextStyle(
-                    fontFamily: 'NotoKufiArabic',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // App Info Section
+              _buildSectionHeader('about_app'.tr()),
+              _buildSettingsCard(
+                children: [
+                  _buildSettingsItem(
+                    icon: Icons.info_outline,
+                    title: 'version'.tr(),
+                    trailing: Text(
+                      '1.0.0', // Replace with your actual version
+                      style: TextStyle(
+                        color: Theme.of(context).hintColor,
+                        fontFamily: 'NotoKufiArabic',
+                      ),
+                    ),
                   ),
-                ),
+                  const Divider(height: 1),
+                  _buildSettingsItem(
+                    icon: Icons.privacy_tip_outlined,
+                    title: 'privacy_policy'.tr(),
+                    onTap: () {
+                      // Add privacy policy navigation
+                    },
+                  ),
+                ],
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontFamily: 'NotoKufiArabic',
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: Colors.grey,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSettingsCard({required List<Widget> children}) {
+    return Card(
+      elevation: 0,
+      color: Get.theme.scaffoldBackgroundColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.grey.shade300, width: 1),
+      ),
+      child: Column(children: children),
+    );
+  }
+
+  Widget _buildSettingsItem({
+    required IconData icon,
+    required String title,
+    Widget? trailing,
+    VoidCallback? onTap,
+    Color? textColor,
+    Color? iconColor,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: iconColor ?? primaryColor),
+      title: Text(
+        title,
+        style: TextStyle(fontFamily: 'NotoKufiArabic', color: textColor),
+      ),
+      trailing: trailing,
+      onTap: onTap,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      minLeadingWidth: 24,
     );
   }
 }

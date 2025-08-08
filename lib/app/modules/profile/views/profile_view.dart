@@ -172,7 +172,7 @@ class ProfileView extends StatelessWidget {
         CustomButton(
           text: 'logout'.tr(),
           trailingIcon: Icons.logout,
-          backgroundColor: Colors.transparent,
+          backgroundColor: Get.theme.scaffoldBackgroundColor,
           textColor: primaryColor,
           iconColor: primaryColor,
           borderSide: BorderSide(color: primaryColor),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
-import 'package:sizer/sizer.dart';
+import 'package:mounakassat_dz/app/routes/app_pages.dart';
 import 'package:mounakassat_dz/app/widgets/custom_appbar.dart';
 import 'package:mounakassat_dz/utils/theme_config.dart';
 import '../../../controllers/theme_controller.dart';
@@ -71,11 +71,11 @@ class HomeView extends GetView<HomeController> {
                                   ],
                                 ),
                               ),
-                              Text(
+                              /* Text(
                                 'announcer'.tr(
-                                  args: [tender.announcer ?? 'Unknown'],
+                                  args: [tender. ?? 'Unknown'],
                                 ),
-                              ),
+                              ), */
                             ],
                           ),
                           trailing: IconButton(
@@ -91,8 +91,8 @@ class HomeView extends GetView<HomeController> {
                           onTap: () {
                             Get.toNamed(
                               isProjectOwner
-                                  ? '/tender_details_owner'
-                                  : '/tender_details_contractor',
+                                  ? Routes.TENDER_DETAILS_OWNER
+                                  : Routes.TENDER_DETAILS_CONTRACTOR,
                               arguments: tender,
                             );
                           },
@@ -103,14 +103,6 @@ class HomeView extends GetView<HomeController> {
           ),
         ),
       ),
-      /* floatingActionButton: isProjectOwner
-          ? FloatingActionButton(
-              onPressed: () => Get.toNamed('/planning'),
-              backgroundColor: primaryColor,
-              tooltip: 'add_project'.tr(),
-              child: const Icon(Icons.add, color: Colors.white),
-            )
-          : null, */
     );
   }
 }

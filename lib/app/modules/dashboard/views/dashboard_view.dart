@@ -21,7 +21,7 @@ class DashboardView extends GetView<DashboardController> {
     final List<Widget> pages = [
       const HomeView(),
       const MyOffersView(),
-      const NotificationsView(),
+      const NotificationView(),
       const ProfileView(),
     ];
 

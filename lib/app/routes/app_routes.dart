@@ -21,6 +21,9 @@ abstract class Routes {
   static const EXECUTION = _Paths.EXECUTION;
   static const FINAL_DELIVERY = _Paths.FINAL_DELIVERY;
   static const NOTIFICATIONS = _Paths.NOTIFICATIONS;
+  static const TENDER_DETAILS_OWNER = _Paths.TENDER_DETAILS_OWNER;
+  static const TENDER_DETAILS_CONTRACTOR = _Paths.TENDER_DETAILS_CONTRACTOR;
+  static const SPLASH = _Paths.SPLASH;
 }
 
 abstract class _Paths {
@@ -44,4 +47,7 @@ abstract class _Paths {
   static const EXECUTION = '/execution';
   static const FINAL_DELIVERY = '/final-delivery';
   static const NOTIFICATIONS = '/notifications';
+  static const TENDER_DETAILS_OWNER = '/tender-details-owner';
+  static const TENDER_DETAILS_CONTRACTOR = '/tender-details-contractor';
+  static const SPLASH = '/splash';
 }

@@ -17,7 +17,7 @@ class DashboardBinding extends Bindings {
     Get.put(AuthController());
     Get.put(SettingsController());
     Get.lazyPut<DashboardController>(() => DashboardController());
-    Get.lazyPut<NotificationsController>(() => NotificationsController());
+    Get.lazyPut<NotificationController>(() => NotificationController());
     Get.lazyPut<FirebaseService>(() => FirebaseService());
     Get.lazyPut<HomeController>(() => HomeController());
     Get.lazyPut<ProfileController>(() => ProfileController());

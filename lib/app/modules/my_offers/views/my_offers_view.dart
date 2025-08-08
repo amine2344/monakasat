@@ -3,6 +3,7 @@ import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mounakassat_dz/app/routes/app_pages.dart';
 import 'package:sizer/sizer.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../utils/theme_config.dart';
 import '../../../controllers/theme_controller.dart';
 import '../controllers/my_offers_controller.dart';
@@ -32,11 +33,11 @@ class MyOffersView extends GetView<MyOffersController> {
                     ),
                   )
                 : ListView.builder(
-                    padding: EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(16.0),
                     itemCount: controller.myOffers.length,
                     itemBuilder: (context, index) {
                       final tender = controller.myOffers[index];
-                      /* final offerCount = tender.offers?.length ?? 0;
+                      final offerCount = tender.offers?.length ?? 0;
                       final userOffer = tender.offers?.firstWhereOrNull(
                         (offer) =>
                             offer['contractorId'] ==
@@ -45,7 +46,7 @@ class MyOffersView extends GetView<MyOffersController> {
                                 .auth
                                 .currentUser
                                 ?.uid,
-                      ); */
+                      );
 
                       return Card(
                         margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -60,15 +61,25 @@ class MyOffersView extends GetView<MyOffersController> {
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              /* Text('category'.tr(args: [tender.category])),
-                              Text('wilaya'.tr(args: [tender.wilaya])),
-                              Text('date'.tr(args: [tender.date])), */
+                              if (tender.category != null)
+                                Text('category'.tr(args: [tender.category!])),
+                              if (tender.wilaya != null)
+                                Text('wilaya'.tr(args: [tender.wilaya!])),
+                              Text(
+                                'date'.tr(
+                                  args: [
+                                    DateFormat(
+                                      'yyyy-MM-dd',
+                                    ).format(tender.createdAt),
+                                  ],
+                                ),
+                              ),
                               Text(
                                 'stage'.tr(
                                   args: [controller.getStageText(tender.stage)],
                                 ),
                               ),
-                              /* if (isProjectOwner)
+                              if (isProjectOwner)
                                 Text(
                                   'offers_received'.tr(
                                     args: [offerCount.toString()],
@@ -81,7 +92,25 @@ class MyOffersView extends GetView<MyOffersController> {
                                       userOffer['status'] ?? 'pending'.tr(),
                                     ],
                                   ),
-                                ), */
+                                ),
+                              if (tender.documentUrl != null)
+                                TextButton(
+                                  onPressed: () async {
+                                    final url = tender.documentUrl!;
+                                    if (await canLaunchUrl(Uri.parse(url))) {
+                                      await launchUrl(Uri.parse(url));
+                                    } else {
+                                      Get.snackbar(
+                                        'error'.tr(),
+                                        'download_not_implemented'.tr(),
+                                      );
+                                    }
+                                  },
+                                  child: Text(
+                                    'download_document'.tr(),
+                                    style: TextStyle(color: primaryColor),
+                                  ),
+                                ),
                             ],
                           ),
                           trailing: Icon(
@@ -95,8 +124,8 @@ class MyOffersView extends GetView<MyOffersController> {
                             );
                             Get.toNamed(
                               isProjectOwner
-                                  ? '/tender_details_owner'
-                                  : '/tender_details_contractor',
+                                  ? Routes.TENDER_DETAILS_OWNER
+                                  : Routes.TENDER_DETAILS_CONTRACTOR,
                               arguments: tender,
                             );
                           },

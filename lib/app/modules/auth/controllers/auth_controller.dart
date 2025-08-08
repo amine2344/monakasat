@@ -1,15 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
 import '../../../data/services/firebase_service.dart';
-
 import '../../../routes/app_pages.dart';
 
 class AuthController extends GetxController {
-  final FirebaseService firebaseService = FirebaseService();
+  final FirebaseService firebaseService = Get.find<FirebaseService>();
   var isLoading = false.obs;
   var selectedRole = 'contractor'.obs;
+  var userName = ''.obs; // Added for TenderDetailsContractorController
   var profilePhotoUrl = ''.obs;
   var confirmPassword = ''.obs;
 
@@ -34,7 +35,7 @@ class AuthController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _loadUserData();
+    loadUserData();
   }
 
   void togglePassHide() {
@@ -42,8 +43,9 @@ class AuthController extends GetxController {
     update();
   }
 
-  Future<void> _loadUserData() async {
+  Future<void> loadUserData() async {
     try {
+      isLoading.value = true;
       final user = firebaseService.auth.currentUser;
       if (user != null) {
         final userDoc = await firebaseService.firestore
@@ -56,6 +58,9 @@ class AuthController extends GetxController {
           phone.value = data['phone'] ?? '';
           selectedRole.value = data['role'] ?? 'contractor';
           profilePhotoUrl.value = data['profilePhotoUrl'] ?? '';
+          userName.value = selectedRole.value == 'contractor'
+              ? '${data['prename'] ?? ''} ${data['name'] ?? ''}'.trim()
+              : data['companyName'] ?? '';
           if (selectedRole.value == 'contractor') {
             name.value = data['name'] ?? '';
             prename.value = data['prename'] ?? '';
@@ -66,18 +71,27 @@ class AuthController extends GetxController {
             companyAddress.value = data['companyAddress'] ?? '';
             companyPhone.value = data['companyPhone'] ?? '';
           }
+          // Update FCM token
+          final token = await firebaseService.messaging.getToken();
+          if (token != null) {
+            await firebaseService.firestore
+                .collection('users')
+                .doc(user.uid)
+                .update({'deviceToken': token});
+            print('Updated FCM token for user ${user.uid}: $token');
+          }
         } else {
-          // No user data in Firestore, reset fields
           resetFields();
         }
       } else {
-        // No user logged in, reset fields
         resetFields();
       }
     } catch (e) {
       debugPrint('ERROR LOADING USER DATA ==> ${e.toString()}');
-      Get.snackbar('خطأ'.tr(), 'failed_to_load_user_data'.tr());
+      Get.snackbar('error'.tr(), 'failed_to_load_user_data'.tr());
       resetFields();
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -98,6 +112,7 @@ class AuthController extends GetxController {
     companyAddress.value = '';
     companyPhone.value = '';
     profilePhotoUrl.value = '';
+    userName.value = '';
     currentStep.value = 1;
   }
 
@@ -120,23 +135,16 @@ class AuthController extends GetxController {
             .get();
         final userRole = userDoc.data()?['role'] ?? 'contractor';
         if (userRole == selectedRole.value) {
-          final token = await firebaseService.messaging.getToken();
-          if (token != null) {
-            await firebaseService.firestore
-                .collection('users')
-                .doc(user.uid)
-                .update({'deviceToken': token});
-          }
-          await _loadUserData();
+          await loadUserData();
           Get.offAllNamed(Routes.DASHBOARD);
         } else {
-          Get.snackbar('خطأ'.tr(), 'role_mismatch'.tr());
+          Get.snackbar('error'.tr(), 'role_mismatch'.tr());
           await firebaseService.signOut();
         }
       }
     } catch (e) {
       debugPrint('ERROR LOGIN ==> ${e.toString()}');
-      Get.snackbar('خطأ'.tr(), 'login_failed'.tr());
+      Get.snackbar('error'.tr(), 'login_failed'.tr());
     } finally {
       isLoading.value = false;
     }
@@ -167,8 +175,10 @@ class AuthController extends GetxController {
             'companyPhone': companyPhone.value,
           },
           'createdAt': DateTime.now(),
+          'deviceToken': await firebaseService.messaging.getToken(),
         });
-        Get.offAllNamed('/dashboard');
+        await loadUserData();
+        Get.offAllNamed(Routes.DASHBOARD);
       }
     } catch (e) {
       Get.snackbar('error'.tr(), 'signup_failed'.tr());

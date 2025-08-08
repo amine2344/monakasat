@@ -1,59 +1,81 @@
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:mime/mime.dart';
 import 'package:mounakassat_dz/app/routes/app_pages.dart';
 import '../../../data/services/firebase_service.dart';
 
+import '../../../data/services/gofile_upload_service.dart';
+import '../../auth/controllers/auth_controller.dart';
+
 class PlanningController extends GetxController {
   final FirebaseService firebaseService = Get.find<FirebaseService>();
+  final AuthController authController = Get.find<AuthController>();
+  final GofileUploadService gofileUploadService = GofileUploadService();
   var isLoading = false.obs;
-  var currentStep = 1.obs;
-  var projectName = ''.obs;
-  var serviceType = ''.obs;
-  var requirements = ''.obs;
-  var budget = 0.0.obs;
+  var startDate = Rxn<DateTime>();
+  var endDate = Rxn<DateTime>();
+  var folderId = Rxn<String>();
+  var selectedFile = Rxn<FilePickerResult>();
+  final projectNameController = TextEditingController();
+  final serviceTypeController = TextEditingController();
+  final requirementsController = TextEditingController();
+  final budgetController = TextEditingController();
+  final legalRequirementsController = TextEditingController();
+  final categoryController = TextEditingController();
+  final wilayaController = TextEditingController();
 
-  void nextStep() {
-    if (currentStep.value < 2) {
-      currentStep.value++;
-      Get.toNamed(
-        Routes.ANNOUNCE,
-        arguments: {
-          'projectName': projectName.value,
-          'serviceType': serviceType.value,
-          'requirements': requirements.value,
-          'budget': budget.value,
-        },
-      );
+  @override
+  void onInit() {
+    super.onInit();
+    final projectId = Get.arguments?['projectId'] as String?;
+    if (projectId != null) {
+      firebaseService.firestore
+          .collection('projects')
+          .doc(projectId)
+          .get()
+          .then((doc) {
+            if (doc.exists) {
+              final data = doc.data()!;
+              projectNameController.text = data['projectName'] ?? '';
+              serviceTypeController.text = data['serviceType'] ?? '';
+              requirementsController.text = data['requirements'] ?? '';
+              budgetController.text = data['budget']?.toString() ?? '';
+              legalRequirementsController.text =
+                  data['legalRequirements'] ?? '';
+              categoryController.text = data['category'] ?? '';
+              wilayaController.text = data['wilaya'] ?? '';
+              startDate.value = (data['startDate'] as Timestamp?)?.toDate();
+              endDate.value = (data['endDate'] as Timestamp?)?.toDate();
+            }
+          });
     }
   }
 
-  void previousStep() {
-    if (currentStep.value > 1) {
-      currentStep.value--;
-      Get.back();
-    }
+  @override
+  void onClose() {
+    projectNameController.dispose();
+    serviceTypeController.dispose();
+    requirementsController.dispose();
+    budgetController.dispose();
+    legalRequirementsController.dispose();
+    categoryController.dispose();
+    wilayaController.dispose();
+    super.onClose();
   }
 
-  Future<void> saveProjectDetails({
-    required String projectName,
-    required String serviceType,
-    required String requirements,
-    required double budget,
-  }) async {
-    this.projectName.value = projectName;
-    this.serviceType.value = serviceType;
-    this.requirements.value = requirements;
-    this.budget.value = budget;
-    nextStep();
+  void setStartDate(DateTime date) {
+    startDate.value = date;
   }
 
-  Future<void> updateProjectDetails({
-    required String projectId,
-    required String projectName,
-    required String serviceType,
-    required String requirements,
-    required double budget,
-  }) async {
+  void setEndDate(DateTime date) {
+    endDate.value = date;
+  }
+
+  Future<void> announceTender({String? projectId}) async {
     isLoading.value = true;
     try {
       final userId = firebaseService.auth.currentUser?.uid;
@@ -61,29 +83,80 @@ class PlanningController extends GetxController {
         Get.snackbar('error'.tr(), 'user_not_authenticated'.tr());
         return;
       }
-      await firebaseService.firestore
-          .collection('projects')
-          .doc(projectId)
-          .update({
-            'projectName': projectName,
-            'serviceType': serviceType,
-            'requirements': requirements,
-            'budget': budget,
-            'updatedAt': DateTime.now(),
-          });
-      Get.snackbar('success'.tr(), 'project_updated'.tr());
-      Get.toNamed(
-        Routes.ANNOUNCE,
-        arguments: {
-          'projectId': projectId,
-          'projectName': projectName,
-          'serviceType': serviceType,
-          'requirements': requirements,
-          'budget': budget,
-        },
-      );
+      if (projectNameController.text.isEmpty ||
+          serviceTypeController.text.isEmpty ||
+          requirementsController.text.isEmpty ||
+          budgetController.text.isEmpty ||
+          categoryController.text.isEmpty ||
+          wilayaController.text.isEmpty) {
+        Get.snackbar('error'.tr(), 'please_fill_all_fields'.tr());
+        return;
+      }
+      final budget = double.tryParse(budgetController.text);
+      if (budget == null) {
+        Get.snackbar('error'.tr(), 'invalid_budget'.tr());
+        return;
+      }
+      if (startDate.value == null || endDate.value == null) {
+        Get.snackbar('error'.tr(), 'please_select_dates'.tr());
+        return;
+      }
+      if (endDate.value!.isBefore(startDate.value!)) {
+        Get.snackbar('error'.tr(), 'end_date_before_start'.tr());
+        return;
+      }
+
+      String? documentUrl;
+      if (selectedFile.value != null) {
+        final file = File(selectedFile.value!.files.single.path!);
+        final mimeType = lookupMimeType(file.path);
+        if (mimeType == null ||
+            ![
+              'image/jpeg',
+              'image/png',
+              'application/pdf',
+            ].contains(mimeType)) {
+          Get.snackbar('error'.tr(), 'unsupported_file_type'.tr());
+          return;
+        }
+        documentUrl = await gofileUploadService.uploadFile(
+          file,
+          folderId: folderId.value,
+        );
+        debugPrint('Uploaded file URL: $documentUrl');
+      }
+
+      final tenderData = {
+        'userId': userId,
+        'projectName': projectNameController.text,
+        'serviceType': serviceTypeController.text,
+        'requirements': requirementsController.text,
+        'budget': budget,
+        'legalRequirements': legalRequirementsController.text,
+        'startDate': startDate.value,
+        'endDate': endDate.value,
+        'createdAt': DateTime.now(),
+        'stage': 'announced',
+        'documentName': selectedFile.value?.files.single.name,
+        'documentUrl': documentUrl,
+        'category': categoryController.text,
+        'wilaya': wilayaController.text,
+        'offers': [],
+      };
+
+      if (projectId != null) {
+        await firebaseService.firestore
+            .collection('projects')
+            .doc(projectId)
+            .update(tenderData);
+      } else {
+        await firebaseService.firestore.collection('projects').add(tenderData);
+      }
+      Get.snackbar('success'.tr(), 'tender_published'.tr());
+      Get.offAllNamed(Routes.HOME);
     } catch (e) {
-      Get.snackbar('error'.tr(), 'update_project_failed'.tr());
+      debugPrint('Error announcing tender: $e');
+      Get.snackbar('error'.tr(), 'publish_tender_failed'.tr());
     } finally {
       isLoading.value = false;
     }

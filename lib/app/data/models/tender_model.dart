@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class TenderModel {
   final String id;
   final String userId;
@@ -9,10 +11,12 @@ class TenderModel {
   final DateTime startDate;
   final DateTime endDate;
   final DateTime createdAt;
-  final String? documentName;
   final String stage;
+  final String? documentName;
+  final String? documentUrl;
+  final String? category;
   final String? wilaya;
-  final String? announcer;
+  final List<Map<String, dynamic>>? offers;
 
   TenderModel({
     required this.id,
@@ -25,10 +29,12 @@ class TenderModel {
     required this.startDate,
     required this.endDate,
     required this.createdAt,
-    this.documentName,
     required this.stage,
+    this.documentName,
+    this.documentUrl,
+    this.category,
     this.wilaya,
-    this.announcer,
+    this.offers,
   });
 
   factory TenderModel.fromJson(Map<String, dynamic> json, String id) {
@@ -38,21 +44,37 @@ class TenderModel {
       projectName: json['projectName'] ?? '',
       serviceType: json['serviceType'] ?? '',
       requirements: json['requirements'] ?? '',
-      budget: (json['budget'] ?? 0.0).toDouble(),
+      budget: (json['budget'] as num?)?.toDouble() ?? 0.0,
       legalRequirements: json['legalRequirements'] ?? '',
-      startDate: DateTime.parse(
-        json['startDate']?.toDate().toString() ?? DateTime.now().toString(),
-      ),
-      endDate: DateTime.parse(
-        json['endDate']?.toDate().toString() ?? DateTime.now().toString(),
-      ),
-      createdAt: DateTime.parse(
-        json['createdAt']?.toDate().toString() ?? DateTime.now().toString(),
-      ),
+      startDate: (json['startDate'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      endDate: (json['endDate'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      createdAt: (json['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      stage: json['stage'] ?? 'announced',
       documentName: json['documentName'],
-      stage: json['stage'] ?? 'planning',
+      documentUrl: json['documentUrl'],
+      category: json['category'],
       wilaya: json['wilaya'],
-      announcer: json['announcer'],
+      offers: (json['offers'] as List<dynamic>?)?.cast<Map<String, dynamic>>(),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'projectName': projectName,
+      'serviceType': serviceType,
+      'requirements': requirements,
+      'budget': budget,
+      'legalRequirements': legalRequirements,
+      'startDate': startDate,
+      'endDate': endDate,
+      'createdAt': createdAt,
+      'stage': stage,
+      'documentName': documentName,
+      'documentUrl': documentUrl,
+      'category': category,
+      'wilaya': wilaya,
+      'offers': offers,
+    };
   }
 }

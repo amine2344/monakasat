@@ -43,13 +43,13 @@ class FirebaseService {
 
   Future<User?> login(String email, String password) async {
     try {
-      UserCredential userCredential = await auth.signInWithEmailAndPassword(
+      final userCredential = await auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
       return userCredential.user;
     } catch (e) {
-      Get.snackbar('خطأ'.tr(), 'login_failed'.tr());
+      print('Error logging in: $e');
       return null;
     }
   }
@@ -133,5 +133,24 @@ class FirebaseService {
       to: '/topics/$topic',
       data: {'title': title, 'body': body},
     ); */
+  }
+  Future<TenderModel?> getTenderById(String tenderId) async {
+    try {
+      final doc = await firestore.collection('projects').doc(tenderId).get();
+      if (doc.exists) {
+        final data = doc.data()!;
+        final userDoc = await firestore
+            .collection('users')
+            .doc(data['userId'])
+            .get();
+        final userData = userDoc.data();
+        data['announcer'] = userData?['name'] ?? 'Unknown';
+        return TenderModel.fromJson(data, doc.id);
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching tender: $e');
+      return null;
+    }
   }
 }
