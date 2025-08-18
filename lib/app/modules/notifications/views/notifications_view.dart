@@ -13,15 +13,7 @@ class NotificationView extends GetView<NotificationController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
-        title: Text(
-          'notifications'.tr(),
-          style: const TextStyle(
-            fontFamily: 'NotoKufiArabic',
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
+      appBar: CustomAppBar(titleText: 'notifications'.tr()),
       body: Directionality(
         textDirection: Get.find<ThemeController>().textDirection.value,
         child: Obx(

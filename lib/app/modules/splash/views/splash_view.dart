@@ -19,6 +19,7 @@ class SplashView extends GetView<SplashController> {
             Image.asset(
               'assets/images/logo-top.png',
               width: 50.w,
+              color: Colors.white,
               height: 50.w,
             ),
             const SizedBox(height: 20),

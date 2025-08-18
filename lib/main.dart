@@ -1,5 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mounakassat_dz/firebase_options.dart';
 import 'package:sizer/sizer.dart';
@@ -128,6 +129,7 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.instance.setAutoInitEnabled(false);
   await EasyLocalization.ensureInitialized();
+  await dotenv.load(fileName: ".env");
 
   // Initialize FirebaseService early
   Get.put(FirebaseService());

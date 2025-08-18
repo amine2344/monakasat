@@ -21,15 +21,7 @@ class LoginView extends GetView<AuthController> {
 
     return Scaffold(
       backgroundColor: Get.theme.scaffoldBackgroundColor,
-      appBar: CustomAppBar(
-        title: Text(
-          'login'.tr(),
-          style: const TextStyle(
-            fontFamily: 'NotoKufiArabic',
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
+      appBar: CustomAppBar(titleText: 'login'.tr()),
       body: Directionality(
         textDirection: Get.find<ThemeController>().textDirection.value,
         child: SingleChildScrollView(

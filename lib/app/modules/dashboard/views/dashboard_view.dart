@@ -3,6 +3,7 @@ import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mounakassat_dz/app/modules/dashboard/views/drawer.dart';
 import 'package:mounakassat_dz/app/modules/notifications/views/notifications_view.dart';
+import 'package:sizer/sizer.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 import '../../../../utils/theme_config.dart';
 import '../../../controllers/theme_controller.dart';
@@ -38,7 +39,6 @@ class DashboardView extends GetView<DashboardController> {
         ),
         endDrawer: CustomDrawer(),
 
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         body: Stack(
           children: [
             Directionality(
@@ -46,9 +46,9 @@ class DashboardView extends GetView<DashboardController> {
               child: pages[controller.selectedIndex.value],
             ),
             Positioned(
-              left: 16,
-              right: 16,
-              bottom: 20,
+              left: 0,
+              right: 0,
+              bottom: 0,
               child: Obx(
                 () => Material(
                   elevation: 1,
@@ -58,38 +58,46 @@ class DashboardView extends GetView<DashboardController> {
                         context,
                       ).bottomNavigationBarTheme.backgroundColor ??
                       Colors.white,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(25),
-                    child: BottomNavigationBar(
-                      backgroundColor: Colors.transparent,
-                      currentIndex: controller.selectedIndex.value,
-                      onTap: controller.changeTab,
-                      selectedItemColor: Theme.of(context).primaryColor,
-                      unselectedItemColor:
-                          Theme.of(
-                            context,
-                          ).bottomNavigationBarTheme.unselectedItemColor ??
-                          Colors.grey,
-                      type: BottomNavigationBarType.fixed,
-                      elevation: 0,
-                      items: [
-                        BottomNavigationBarItem(
-                          icon: const Icon(Icons.home),
-                          label: 'home'.tr(),
-                        ),
-                        BottomNavigationBarItem(
-                          icon: const Icon(Icons.local_offer),
-                          label: 'my_offers'.tr(),
-                        ),
-                        BottomNavigationBarItem(
-                          icon: const Icon(Icons.notifications),
-                          label: 'notifications'.tr(),
-                        ),
-                        BottomNavigationBarItem(
-                          icon: const Icon(Icons.person),
-                          label: 'profile'.tr(),
-                        ),
-                      ],
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      /* border: Border(
+                        top: BorderSide(color: Colors.grey, width: 1.w),
+                      ), */
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(25),
+                      child: BottomNavigationBar(
+                        backgroundColor: Colors.transparent,
+                        currentIndex: controller.selectedIndex.value,
+                        onTap: controller.changeTab,
+                        selectedItemColor: Theme.of(context).primaryColor,
+                        unselectedItemColor:
+                            Theme.of(
+                              context,
+                            ).bottomNavigationBarTheme.unselectedItemColor ??
+                            Colors.grey,
+                        type: BottomNavigationBarType.fixed,
+                        elevation: 0,
+                        items: [
+                          BottomNavigationBarItem(
+                            icon: const Icon(Icons.home),
+                            label: 'home'.tr(),
+                          ),
+                          BottomNavigationBarItem(
+                            icon: const Icon(Icons.local_offer),
+                            label: 'my_offers'.tr(),
+                          ),
+                          BottomNavigationBarItem(
+                            icon: const Icon(Icons.notifications),
+                            label: 'notifications'.tr(),
+                          ),
+                          BottomNavigationBarItem(
+                            icon: const Icon(Icons.person),
+                            label: 'profile'.tr(),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

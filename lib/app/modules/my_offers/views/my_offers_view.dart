@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mounakassat_dz/app/routes/app_pages.dart';
+import 'package:mounakassat_dz/app/widgets/custom_appbar.dart';
+import 'package:mounakassat_dz/app/widgets/custom_button.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../utils/theme_config.dart';
@@ -19,6 +21,16 @@ class MyOffersView extends GetView<MyOffersController> {
     final isProjectOwner = authController.selectedRole.value == 'project_owner';
 
     return Scaffold(
+      appBar: CustomAppBar(
+        centerTitle: false,
+        trailing: isProjectOwner
+            ? IconButton(
+                icon: Icon(Icons.add, color: lightColor, size: 20.sp),
+                onPressed: () => Get.toNamed(Routes.PLANNING),
+              )
+            : null,
+        titleText: 'add_project'.tr(),
+      ),
       body: Directionality(
         textDirection: themeController.textDirection.value,
         child: SafeArea(
@@ -136,18 +148,6 @@ class MyOffersView extends GetView<MyOffersController> {
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      floatingActionButton: isProjectOwner
-          ? Padding(
-              padding: EdgeInsets.only(bottom: 12.h, left: 5.w, right: 5.w),
-              child: FloatingActionButton(
-                onPressed: () => Get.toNamed(Routes.PLANNING),
-                backgroundColor: primaryColor,
-                tooltip: 'add_project'.tr(),
-                child: const Icon(Icons.add, color: Colors.white),
-              ),
-            )
-          : null,
     );
   }
 }

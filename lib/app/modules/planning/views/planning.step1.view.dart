@@ -10,9 +10,10 @@ import '../../../controllers/theme_controller.dart';
 import '../../../widgets/custom_textfield.dart';
 import '../../auth/views/signup_view.dart';
 import '../controllers/planning_controller.dart';
+import 'planning.step2.view.dart';
 
-class PlanningView extends GetView<PlanningController> {
-  const PlanningView({super.key});
+class PlanningStep1View extends GetView<PlanningController> {
+  const PlanningStep1View({super.key});
 
   void _showSelectionDialog(
     BuildContext context,
@@ -69,9 +70,10 @@ class PlanningView extends GetView<PlanningController> {
       backgroundColor: Get.theme.scaffoldBackgroundColor,
       appBar: CustomAppBar(
         title: Text(
-          isEditing ? 'edit_project'.tr() : 'project_planning'.tr(),
+          isEditing ? 'edit_project_step1'.tr() : 'project_planning_step1'.tr(),
           style: const TextStyle(
             fontFamily: 'NotoKufiArabic',
+            color: Colors.white,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -97,8 +99,8 @@ class PlanningView extends GetView<PlanningController> {
                     children: [
                       Text(
                         isEditing
-                            ? 'edit_project_details'.tr()
-                            : 'enter_project_details'.tr(),
+                            ? 'edit_project_details_step1'.tr()
+                            : 'enter_project_details_step1'.tr(),
                         style: const TextStyle(
                           fontFamily: 'NotoKufiArabic',
                           fontSize: 24,
@@ -125,7 +127,7 @@ class PlanningView extends GetView<PlanningController> {
                         isDropdown: true,
                         onTap: () => _showSelectionDialog(
                           context,
-                          SignUpView.activitySectors,
+                          SignUpView.tenderType,
                           'service_type',
                           (value) =>
                               controller.serviceTypeController.text = value,
@@ -144,11 +146,7 @@ class PlanningView extends GetView<PlanningController> {
                         isDropdown: true,
                         onTap: () => _showSelectionDialog(
                           context,
-                          [
-                            'Construction',
-                            'IT',
-                            'Consulting',
-                          ], // Replace with your categories
+                          SignUpView.activitySectors,
                           'category',
                           (value) => controller.categoryController.text = value,
                         ),
@@ -166,11 +164,7 @@ class PlanningView extends GetView<PlanningController> {
                         isDropdown: true,
                         onTap: () => _showSelectionDialog(
                           context,
-                          [
-                            'Algiers',
-                            'Oran',
-                            'Constantine',
-                          ], // Replace with your wilayas
+                          SignUpView.wilayas,
                           'wilaya',
                           (value) => controller.wilayaController.text = value,
                         ),
@@ -208,141 +202,10 @@ class PlanningView extends GetView<PlanningController> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 16),
-                      CustomTextField(
-                        controller: controller.legalRequirementsController,
-                        labelText: 'legal_requirements'.tr(),
-                        prefixIcon: Icons.gavel,
-                        maxLines: 4,
-                        validator: (value) {
-                          return null; // Optional field
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          CustomButton(
-                            text: 'upload_documents'.tr(),
-                            trailingIcon: Icons.upload_file,
-                            backgroundColor: primaryColor,
-                            textColor: Colors.white,
-                            iconColor: Colors.white,
-                            fixedSize: Size(50.w, 6.h),
-                            onPressed: () async {
-                              final result = await FilePicker.platform
-                                  .pickFiles(
-                                    type: FileType.custom,
-                                    allowedExtensions: [
-                                      'jpg',
-                                      'jpeg',
-                                      'png',
-                                      'pdf',
-                                    ],
-                                  );
-                              if (result != null) {
-                                controller.selectedFile.value = result;
-                              }
-                            },
-                          ),
-                          SizedBox(width: 2.w),
-                          Obx(
-                            () => controller.selectedFile.value != null
-                                ? Flexible(
-                                    child: Text(
-                                      controller
-                                          .selectedFile
-                                          .value!
-                                          .files
-                                          .single
-                                          .name,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontFamily: 'NotoKufiArabic',
-                                      ),
-                                    ),
-                                  )
-                                : Container(),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          CustomButton(
-                            text: 'start_date'.tr(),
-                            trailingIcon: Icons.calendar_today,
-                            backgroundColor: primaryColor,
-                            textColor: Colors.white,
-                            iconColor: Colors.white,
-                            fixedSize: Size(50.w, 6.h),
-                            onPressed: () async {
-                              final pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime.now(),
-                                lastDate: DateTime(2026),
-                              );
-                              if (pickedDate != null) {
-                                controller.setStartDate(pickedDate);
-                              }
-                            },
-                          ),
-                          SizedBox(width: 2.w),
-                          Obx(
-                            () => Text(
-                              controller.startDate.value != null
-                                  ? DateFormat(
-                                      'yyyy-MM-dd',
-                                    ).format(controller.startDate.value!)
-                                  : '',
-                              style: const TextStyle(
-                                fontFamily: 'NotoKufiArabic',
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          CustomButton(
-                            text: 'end_date'.tr(),
-                            trailingIcon: Icons.calendar_today,
-                            backgroundColor: primaryColor,
-                            textColor: Colors.white,
-                            iconColor: Colors.white,
-                            fixedSize: Size(50.w, 6.h),
-                            onPressed: () async {
-                              final pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime.now(),
-                                lastDate: DateTime(2026),
-                              );
-                              if (pickedDate != null) {
-                                controller.setEndDate(pickedDate);
-                              }
-                            },
-                          ),
-                          SizedBox(width: 2.w),
-                          Obx(
-                            () => Text(
-                              controller.endDate.value != null
-                                  ? DateFormat(
-                                      'yyyy-MM-dd',
-                                    ).format(controller.endDate.value!)
-                                  : '',
-                              style: const TextStyle(
-                                fontFamily: 'NotoKufiArabic',
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
                       const SizedBox(height: 24),
                       CustomButton(
-                        text: isEditing ? 'update'.tr() : 'publish'.tr(),
-                        trailingIcon: Icons.send,
+                        text: 'save_and_continue'.tr(),
+                        trailingIcon: Icons.arrow_forward,
                         backgroundColor: primaryColor,
                         textColor: Colors.white,
                         iconColor: Colors.white,
@@ -356,8 +219,9 @@ class PlanningView extends GetView<PlanningController> {
                             ? null
                             : () {
                                 if (formKey.currentState!.validate()) {
-                                  controller.announceTender(
-                                    projectId: projectId,
+                                  Get.to(
+                                    () => const PlanningStep2View(),
+                                    arguments: Get.arguments,
                                   );
                                 }
                               },

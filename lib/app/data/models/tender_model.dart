@@ -17,6 +17,7 @@ class TenderModel {
   final String? category;
   final String? wilaya;
   final List<Map<String, dynamic>>? offers;
+  final String? announcer; // Added to store announcer name
 
   TenderModel({
     required this.id,
@@ -35,6 +36,7 @@ class TenderModel {
     this.category,
     this.wilaya,
     this.offers,
+    this.announcer,
   });
 
   factory TenderModel.fromJson(Map<String, dynamic> json, String id) {
@@ -55,6 +57,7 @@ class TenderModel {
       category: json['category'],
       wilaya: json['wilaya'],
       offers: (json['offers'] as List<dynamic>?)?.cast<Map<String, dynamic>>(),
+      announcer: json['announcer'],
     );
   }
 
@@ -75,6 +78,7 @@ class TenderModel {
       'category': category,
       'wilaya': wilaya,
       'offers': offers,
+      'announcer': announcer,
     };
   }
 }

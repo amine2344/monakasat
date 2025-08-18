@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mounakassat_dz/main.dart';
@@ -48,7 +49,7 @@ class NotificationController extends GetxController {
           .doc(userId)
           .collection('notifications')
           .add(notification);
-      print('Notification saved: ${notification['title']}');
+      debugPrint('Notification saved: ${notification['title']}');
     } catch (e) {
       Get.snackbar('error'.tr(), 'failed_to_save_notification'.tr());
     }

@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
+import '../../../helpers/notifications.sender.dart';
 import '../models/tender_model.dart';
 import '../models/tender_stage_model.dart';
 import '../models/offer_model.dart';
@@ -127,13 +128,20 @@ class FirebaseService {
     return await imageUploadService.uploadImage(file);
   }
 
-  Future<void> sendNotification(String topic, String title, String body) async {
-    //TODO: IMPLEMENT NOTIFICATIONS
-    /* await messaging.sendMessage(
-      to: '/topics/$topic',
-      data: {'title': title, 'body': body},
-    ); */
+  Future<void> sendNotification(
+    String deviceToken,
+    String title,
+    String body,
+  ) async {
+    final sender = NotiifcationSender();
+    await sender.sendCurlRequest(
+      token: deviceToken,
+      title: title,
+      message: body,
+      type: 'info',
+    );
   }
+
   Future<TenderModel?> getTenderById(String tenderId) async {
     try {
       final doc = await firestore.collection('projects').doc(tenderId).get();

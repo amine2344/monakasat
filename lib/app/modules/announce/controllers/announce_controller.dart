@@ -1,42 +1,27 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:mounakassat_dz/app/routes/app_pages.dart';
+import 'package:mounakassat_dz/constants/app_constants.dart';
+
+import '../../../data/services/cloudinary_files_uploader.dart';
 import '../../../data/services/firebase_service.dart';
-import '../../../data/services/gofile_upload_service.dart';
 import '../../auth/controllers/auth_controller.dart';
 
 class AnnounceController extends GetxController {
   final FirebaseService firebaseService = Get.find<FirebaseService>();
   final AuthController authController = Get.find<AuthController>();
-  final GofileUploadService gofileUploadService = GofileUploadService();
+
+  final CloudinaryUploadService cloudinaryUploadService =
+      CloudinaryUploadService(backendUrl: backendUrl);
   var isLoading = false.obs;
   var startDate = Rxn<DateTime>();
   var endDate = Rxn<DateTime>();
   var folderId = Rxn<String>();
-  var selectedFile = Rxn<FilePickerResult>();
-  final projectNameController = TextEditingController();
-  final serviceTypeController = TextEditingController();
-  final requirementsController = TextEditingController();
-  final budgetController = TextEditingController();
-  final legalRequirementsController = TextEditingController();
-  final categoryController = TextEditingController();
-  final wilayaController = TextEditingController();
-
-  @override
-  void onClose() {
-    projectNameController.dispose();
-    serviceTypeController.dispose();
-    requirementsController.dispose();
-    budgetController.dispose();
-    legalRequirementsController.dispose();
-    categoryController.dispose();
-    wilayaController.dispose();
-    super.onClose();
-  }
 
   void setStartDate(DateTime date) {
     startDate.value = date;
@@ -86,11 +71,11 @@ class AnnounceController extends GetxController {
           Get.snackbar('error'.tr(), 'unsupported_file_type'.tr());
           return;
         }
-        documentUrl = await gofileUploadService.uploadFile(
+        /* documentUrl = await cloudinaryUploadService.uploadFile(
           file,
-          folderId: folderId.value,
+          folder: folderId.value,
         );
-        debugPrint('Uploaded file URL: $documentUrl');
+        debugPrint('Uploaded file URL: $documentUrl'); */
       }
 
       final tenderData = {
@@ -119,6 +104,14 @@ class AnnounceController extends GetxController {
       } else {
         await firebaseService.firestore.collection('projects').add(tenderData);
       }
+
+      // Send notification to tender_updates topic
+      await firebaseService.sendNotification(
+        'tender_updates',
+        'new_tender_published'.tr(),
+        'tender_published_body'.tr(args: [projectName]),
+      );
+
       Get.snackbar('success'.tr(), 'tender_published'.tr());
       Get.offAllNamed(Routes.HOME);
     } catch (e) {

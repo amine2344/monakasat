@@ -24,7 +24,7 @@ import '../modules/notifications/views/notifications_view.dart';
 import '../modules/open_envloppes/bindings/open_envloppes_binding.dart';
 import '../modules/open_envloppes/views/open_envloppes_view.dart';
 import '../modules/planning/bindings/planning_binding.dart';
-import '../modules/planning/views/planning_view.dart';
+import '../modules/planning/views/planning.step1.view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/profile_view.dart';
 import '../modules/search/bindings/search_binding.dart';
@@ -74,6 +74,7 @@ class AppPages {
       name: _Paths.SEARCH,
       page: () => const SearchView(),
       binding: SearchBinding(),
+      transition: Transition.rightToLeftWithFade,
     ),
     GetPage(
       name: _Paths.DASHBOARD,
@@ -97,7 +98,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.PLANNING,
-      page: () => const PlanningView(),
+      page: () => const PlanningStep1View(),
       binding: PlanningBinding(),
     ),
     GetPage(

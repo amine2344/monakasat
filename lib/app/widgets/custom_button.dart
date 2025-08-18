@@ -8,6 +8,7 @@ class CustomButton extends StatelessWidget {
   final Color? backgroundColor;
   final Color? textColor;
   final Color? iconColor;
+  final double? iconSize;
   final Size? fixedSize;
   final BorderSide? borderSide;
   final EdgeInsetsGeometry? padding;
@@ -23,6 +24,7 @@ class CustomButton extends StatelessWidget {
     this.textColor,
     this.iconColor,
     this.fixedSize,
+    this.iconSize,
     this.borderSide,
     this.padding,
     this.borderRadius,
@@ -62,7 +64,7 @@ class CustomButton extends StatelessWidget {
             const SizedBox(width: 8),
             Icon(
               trailingIcon,
-              size: 20,
+              size: iconSize ?? 20,
               color: iconColor ?? textColor ?? Colors.white,
             ),
           ],
