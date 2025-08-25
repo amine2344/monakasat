@@ -10,6 +10,7 @@ class MyOffersController extends GetxController {
   final FirebaseService firebaseService = Get.find<FirebaseService>();
   final AuthController authController = Get.find<AuthController>();
   var myOffers = <TenderModel>[].obs;
+  var myOfferDetails = <Map<String, dynamic>>[].obs;
   var isLoading = true.obs;
 
   @override
@@ -36,26 +37,51 @@ class MyOffersController extends GetxController {
             .collection('projects')
             .where('userId', isEqualTo: userId)
             .get();
-      } else {
-        querySnapshot = await firebaseService.firestore
-            .collection('projects')
-            .where(
-              'offers',
-              arrayContainsAny: [
-                {'contractorId': userId},
-              ],
+        myOffers.value = querySnapshot.docs
+            .map(
+              (doc) => TenderModel.fromJson(
+                doc.data() as Map<String, dynamic>,
+                doc.id,
+              ),
             )
+            .toList();
+        myOfferDetails.value = List.filled(myOffers.length, {});
+      } else {
+        // Fetch tenders where the user has submitted an offer
+        final offerSnapshot = await firebaseService.firestore
+            .collectionGroup('offers')
+            .where('contractorId', isEqualTo: userId)
             .get();
+
+        final tenderIds = offerSnapshot.docs
+            .map((doc) => doc.reference.parent.parent!.id)
+            .toSet();
+        final tenders = <TenderModel>[];
+        final offerDetails = <Map<String, dynamic>>[];
+
+        for (var tenderId in tenderIds) {
+          final tenderDoc = await firebaseService.firestore
+              .collection('projects')
+              .doc(tenderId)
+              .get();
+          if (tenderDoc.exists) {
+            tenders.add(
+              TenderModel.fromJson(
+                tenderDoc.data() as Map<String, dynamic>,
+                tenderDoc.id,
+              ),
+            );
+            final offerDoc = offerSnapshot.docs.firstWhere(
+              (doc) => doc.reference.parent.parent!.id == tenderId,
+            );
+            offerDetails.add({...offerDoc.data(), 'id': offerDoc.id});
+          }
+        }
+
+        myOffers.value = tenders;
+        myOfferDetails.value = offerDetails;
       }
 
-      myOffers.value = querySnapshot.docs
-          .map(
-            (doc) => TenderModel.fromJson(
-              doc.data() as Map<String, dynamic>,
-              doc.id,
-            ),
-          )
-          .toList();
       debugPrint('Fetched ${myOffers.length} offers');
     } catch (e) {
       debugPrint('Error fetching offers: $e');
@@ -68,7 +94,17 @@ class MyOffersController extends GetxController {
   String getStageText(String stage) {
     switch (stage) {
       case 'announced':
-        return 'pending'.tr();
+        return 'announced'.tr();
+      case 'envelope_opened':
+        return 'envelope_opened'.tr();
+      case 'evaluated':
+        return 'evaluated'.tr();
+      case 'contract_signed':
+        return 'contract_signed'.tr();
+      case 'execution':
+        return 'execution'.tr();
+      case 'completed':
+        return 'completed'.tr();
       default:
         return stage;
     }
@@ -76,6 +112,5 @@ class MyOffersController extends GetxController {
 
   void trackInteraction(String tenderId, String action) {
     debugPrint('Tracked interaction: $action for tender $tenderId');
-    // Implement analytics if needed
   }
 }

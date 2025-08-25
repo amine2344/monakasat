@@ -44,7 +44,7 @@ class PlanningStep2View extends GetView<PlanningController> {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 5.w),
               child: Obx(
                 () => Form(
                   key: formKey,
@@ -74,7 +74,7 @@ class PlanningStep2View extends GetView<PlanningController> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      Row(
+                      Column(
                         children: [
                           CustomButton(
                             text: 'upload_documents'.tr(),
@@ -82,7 +82,7 @@ class PlanningStep2View extends GetView<PlanningController> {
                             backgroundColor: primaryColor,
                             textColor: Colors.white,
                             iconColor: Colors.white,
-                            fixedSize: Size(50.w, 6.h),
+                            fixedSize: Size(90.w, 6.h),
                             onPressed: () async {
                               final result = await FilePicker.platform
                                   .pickFiles(
@@ -121,7 +121,7 @@ class PlanningStep2View extends GetView<PlanningController> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      Row(
+                      Column(
                         children: [
                           CustomButton(
                             text: 'upload_featured_image'.tr(),
@@ -129,7 +129,7 @@ class PlanningStep2View extends GetView<PlanningController> {
                             backgroundColor: primaryColor,
                             textColor: Colors.white,
                             iconColor: Colors.white,
-                            fixedSize: Size(50.w, 6.h),
+                            fixedSize: Size(90.w, 6.h),
                             onPressed: () async {
                               final result = await FilePicker.platform
                                   .pickFiles(
@@ -163,7 +163,7 @@ class PlanningStep2View extends GetView<PlanningController> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      Row(
+                      Column(
                         children: [
                           CustomButton(
                             text: 'start_date'.tr(),
@@ -171,7 +171,7 @@ class PlanningStep2View extends GetView<PlanningController> {
                             backgroundColor: primaryColor,
                             textColor: Colors.white,
                             iconColor: Colors.white,
-                            fixedSize: Size(50.w, 6.h),
+                            fixedSize: Size(90.w, 6.h),
                             onPressed: () async {
                               final pickedDate = await showDatePicker(
                                 context: context,
@@ -200,7 +200,7 @@ class PlanningStep2View extends GetView<PlanningController> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      Row(
+                      Column(
                         children: [
                           CustomButton(
                             text: 'end_date'.tr(),
@@ -208,7 +208,11 @@ class PlanningStep2View extends GetView<PlanningController> {
                             backgroundColor: primaryColor,
                             textColor: Colors.white,
                             iconColor: Colors.white,
-                            fixedSize: Size(50.w, 6.h),
+                            fixedSize: Size(90.w, 6.h),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal: 24,
+                            ),
                             onPressed: () async {
                               final pickedDate = await showDatePicker(
                                 context: context,
@@ -243,7 +247,7 @@ class PlanningStep2View extends GetView<PlanningController> {
                         backgroundColor: primaryColor,
                         textColor: Colors.white,
                         iconColor: Colors.white,
-                        fixedSize: Size(70.w, 8.h),
+                        fixedSize: Size(90.w, 8.h),
                         padding: const EdgeInsets.symmetric(
                           vertical: 16,
                           horizontal: 24,

@@ -13,6 +13,8 @@ import '../modules/evaluate_offers/bindings/evaluate_offers_binding.dart';
 import '../modules/evaluate_offers/views/evaluate_offers_view.dart';
 import '../modules/execution/bindings/execution_binding.dart';
 import '../modules/execution/views/execution_view.dart';
+import '../modules/favorite/bindings/favorite_binding.dart';
+import '../modules/favorite/views/favorite_view.dart';
 import '../modules/final_delivery/bindings/final_delivery_binding.dart';
 import '../modules/final_delivery/views/final_delivery_view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -155,6 +157,11 @@ class AppPages {
       name: _Paths.SPLASH,
       page: () => const SplashView(),
       binding: SplashBinding(),
+    ),
+    GetPage(
+      name: _Paths.FAVORITE,
+      page: () => const FavoriteView(),
+      binding: FavoriteBinding(),
     ),
   ];
 }

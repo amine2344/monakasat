@@ -3,6 +3,7 @@ import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mounakassat_dz/app/modules/dashboard/views/drawer.dart';
 import 'package:mounakassat_dz/app/modules/notifications/views/notifications_view.dart';
+import 'package:mounakassat_dz/app/routes/app_pages.dart';
 import 'package:sizer/sizer.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 import '../../../../utils/theme_config.dart';
@@ -29,14 +30,24 @@ class DashboardView extends GetView<DashboardController> {
     return Obx(
       () => Scaffold(
         key: scaffoldKey,
-        appBar: CustomAppBar(
-          fromDash: true,
-          endDrawerIcon: Icons.menu,
-          centerTitle: false,
-          onEndDrawerPressed: () {
-            scaffoldKey.currentState?.openEndDrawer();
-          },
-        ),
+        appBar: controller.selectedIndex.value == 0
+            ? CustomAppBar(
+                backgroundImage: 'assets/images/monakasat-appbar.png',
+                fromDash: true,
+                endDrawerIcon: Icons.menu,
+                searchBar: CustomSearchBar(
+                  controller: TextEditingController(),
+                  hintText: 'search_tenders'.tr(),
+                  onSearch: () {
+                    Get.toNamed(Routes.SEARCH);
+                  },
+                ),
+                centerTitle: false,
+                onEndDrawerPressed: () {
+                  scaffoldKey.currentState?.openEndDrawer();
+                },
+              )
+            : null,
         endDrawer: CustomDrawer(),
 
         body: Stack(

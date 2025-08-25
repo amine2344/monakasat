@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
@@ -89,7 +90,7 @@ class PlanningStep1View extends GetView<PlanningController> {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 5.w),
               child: Obx(
                 () => Form(
                   key: formKey,
@@ -189,8 +190,8 @@ class PlanningStep1View extends GetView<PlanningController> {
                       const SizedBox(height: 16),
                       CustomTextField(
                         controller: controller.budgetController,
-                        labelText: 'budget'.tr(),
-                        prefixIcon: Icons.attach_money,
+                        labelText: "${'budget'.tr()} دج",
+                        prefixIcon: Icons.import_contacts_sharp,
                         keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value == null || value.isEmpty)

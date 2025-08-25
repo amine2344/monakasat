@@ -24,6 +24,7 @@ abstract class Routes {
   static const TENDER_DETAILS_OWNER = _Paths.TENDER_DETAILS_OWNER;
   static const TENDER_DETAILS_CONTRACTOR = _Paths.TENDER_DETAILS_CONTRACTOR;
   static const SPLASH = _Paths.SPLASH;
+  static const FAVORITE = _Paths.FAVORITE;
 }
 
 abstract class _Paths {
@@ -50,4 +51,5 @@ abstract class _Paths {
   static const TENDER_DETAILS_OWNER = '/tender-details-owner';
   static const TENDER_DETAILS_CONTRACTOR = '/tender-details-contractor';
   static const SPLASH = '/splash';
+  static const FAVORITE = '/favorite';
 }

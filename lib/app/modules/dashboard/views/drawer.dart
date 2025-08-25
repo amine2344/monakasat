@@ -23,7 +23,12 @@ class CustomDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(color: primaryColor),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/monakasat-appbar.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
             child: Text(
               'app_title'.tr(),
               style: const TextStyle(
@@ -31,9 +36,17 @@ class CustomDrawer extends StatelessWidget {
                 fontSize: 24,
                 fontFamily: 'NotoKufiArabic',
                 fontWeight: FontWeight.w700,
+                shadows: [
+                  Shadow(
+                    offset: Offset(2, 2),
+                    blurRadius: 4.0,
+                    color: Colors.black54,
+                  ),
+                ],
               ),
             ),
           ),
+
           ListTile(
             leading: const Icon(Icons.home),
             title: Text(
@@ -53,8 +66,19 @@ class CustomDrawer extends StatelessWidget {
               style: const TextStyle(fontFamily: 'NotoKufiArabic'),
             ),
             onTap: () {
-              controller.changeTab(2);
+              controller.changeTab(1);
               Get.back();
+            },
+          ),
+          ListTile(
+            leading: const Icon(CupertinoIcons.heart_fill),
+            title: Text(
+              'favorite'.tr(),
+              style: const TextStyle(fontFamily: 'NotoKufiArabic'),
+            ),
+            onTap: () {
+              Get.back();
+              Get.toNamed(Routes.FAVORITE);
             },
           ),
           ListTile(
@@ -69,7 +93,7 @@ class CustomDrawer extends StatelessWidget {
             },
           ),
           const Divider(),
-          ListTile(
+          /* ListTile(
             leading: const Icon(Icons.subscriptions),
             title: const Text(
               'باقات الإشتراك',
@@ -78,7 +102,7 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               Get.toNamed('/subscription');
             },
-          ),
+          ), */
           (firebaseService.auth.currentUser == null)
               ? ListTile(
                   leading: const Icon(Icons.login),

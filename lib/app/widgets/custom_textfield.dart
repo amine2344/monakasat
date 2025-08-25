@@ -16,6 +16,7 @@ class CustomTextField extends StatefulWidget {
   final Color? fillColor;
   final Color? borderColor;
   final bool isDropdown;
+  final TextDirection? textDirection;
   final VoidCallback? onTap;
   final Function(String)? onChanged;
 
@@ -24,6 +25,7 @@ class CustomTextField extends StatefulWidget {
     this.controller,
     required this.labelText,
     this.prefixIcon,
+    this.textDirection,
     this.suffixIcon,
     this.validator,
     this.keyboardType,
@@ -56,6 +58,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return Obx(
       () => TextFormField(
         controller: widget.controller,
+
         decoration: InputDecoration(
           labelText: widget.labelText,
           prefixIcon: widget.prefixIcon != null
