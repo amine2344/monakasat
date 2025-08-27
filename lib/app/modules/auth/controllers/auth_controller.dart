@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
@@ -50,14 +52,12 @@ class AuthController extends GetxController {
       isLoading.value = true;
       final authUser = firebaseService.auth.currentUser;
       if (authUser != null) {
-        // Check SharedPreferences first
         UserModel? storedUser = await appStorage.getUser(authUser.uid);
         if (storedUser != null) {
           user.value = storedUser;
           selectedRole.value = storedUser.role;
           debugPrint('Loaded user from SharedPreferences: ${storedUser.email}');
         } else {
-          // Fetch from Firestore if not in SharedPreferences
           final userDoc = await firebaseService.firestore
               .collection('users')
               .doc(authUser.uid)
@@ -74,7 +74,6 @@ class AuthController extends GetxController {
             resetFields();
           }
         }
-        // Update FCM token asynchronously
         _updateFcmToken(authUser.uid);
       } else {
         resetFields();
@@ -145,24 +144,13 @@ class AuthController extends GetxController {
             .collection('users')
             .doc(authUser.uid)
             .get();
-
-        if (!userDoc.exists) {
-          throw Exception('User document not found in Firestore');
-        }
-
-        final userData = UserModel.fromJson(userDoc.data()!, authUser.uid);
-        final userRole = userData.role;
-
+        final userRole = userDoc.data()?['role'] ?? 'contractor';
         if (userRole == selectedRole.value) {
+          final userData = UserModel.fromJson(userDoc.data()!, authUser.uid);
           user.value = userData;
-
           await appStorage.saveUser(authUser.uid, userData);
-
-          debugPrint('✅ Saved latest user data to AppStorage');
-
           Get.offAllNamed(Routes.DASHBOARD);
         } else {
-          // ❌ Role mismatch
           Get.showSnackbar(
             GetSnackBar(
               title: 'error'.tr(),
@@ -221,6 +209,8 @@ class AuthController extends GetxController {
               : null,
           createdAt: DateTime.now(),
           deviceToken: await firebaseService.messaging.getToken(),
+          favorites: [],
+          subscription: selectedRole.value == 'contractor' ? 'free' : null,
         );
         await firebaseService.firestore
             .collection('users')

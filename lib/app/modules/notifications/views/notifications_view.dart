@@ -44,9 +44,7 @@ class NotificationView extends GetView<NotificationController> {
                         vertical: 1.h,
                         horizontal: 2.w,
                       ),
-                      color: notification['read']
-                          ? Colors.white
-                          : Colors.grey[100],
+                      color: Get.theme.scaffoldBackgroundColor,
                       elevation: 2,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),

@@ -35,7 +35,6 @@ class HomeController extends GetxController {
                 )
                 .toList(),
           );
-          isLoading.value = false;
         },
         onError: (e) {
           Get.snackbar('error'.tr(), 'failed_to_load_tenders'.tr());
@@ -43,6 +42,7 @@ class HomeController extends GetxController {
           isLoading.value = false;
         },
       );
+      isLoading.value = false;
     } catch (e) {
       Get.snackbar('error'.tr(), 'failed_to_load_tenders'.tr());
       debugPrint('Error fetching tenders: $e');

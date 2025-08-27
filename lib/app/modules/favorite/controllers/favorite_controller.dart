@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../data/models/tender_model.dart';
@@ -13,7 +14,9 @@ class FavoriteController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchFavoriteTenders();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchFavoriteTenders();
+    });
   }
 
   void fetchFavoriteTenders() {

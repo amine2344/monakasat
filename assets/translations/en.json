@@ -172,6 +172,7 @@
  ,"cannot_open_document": "Cannot open document",
   "download_requirements": "Download Requirements",
   "add_project": "Add Project",
+  "my_projects":"My projects",
   "favorite": "Favorites",
   "no_favorites_available": "No favorite tenders available",
   "user_not_authenticated": "User not authenticated",
@@ -233,5 +234,25 @@
 ,"publishing_tender": "Publishing the tender",
   "unsupported_file_type": "Unsupported file type",
   "unsupported_image_type": "Unsupported image type",
-  "publish_tender_failed": "Failed to publish tender"
+  "publish_tender_failed": "Failed to publish tender",
+  
+  "created_at": "Created At",
+  "favorites": "Favorites",
+  "subscription": "Subscription",
+  "no_favorites": "No favorites",
+  
+  "upload_document": "Upload Document",
+  "remove_document": "Remove Document","submitting_offer": "Submitting offer...",
+  "please_enter_execution_duration": "Please enter execution duration",
+  "invalid_execution_duration": "Invalid execution duration",
+  
+  "to": "To",
+  "add_to_favorites": "Add to favorites",
+  
+  "app_settings": "App Settings",
+  "account": "Account",
+  "about_app": "About App",
+  "version": "Version",
+  "privacy_policy": "Privacy Policy"
+  
 }

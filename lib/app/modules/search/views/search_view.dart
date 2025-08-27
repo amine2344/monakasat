@@ -282,9 +282,9 @@ class SearchView extends GetView<SearchController> {
                                     ),
                                     child: Text(
                                       'reset'.tr(),
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontFamily: 'NotoKufiArabic',
-                                        color: Colors.black,
+                                        color: Get.textTheme.bodyMedium?.color,
                                       ),
                                     ),
                                   ),

@@ -9,7 +9,7 @@ import '../../auth/controllers/auth_controller.dart';
 class TenderDetailsOwnerController extends GetxController {
   final FirebaseService firebaseService = Get.find<FirebaseService>();
   final AuthController authController = Get.find<AuthController>();
-  late TenderModel tender;
+  var tender = Rxn<TenderModel>();
   final offers = <Map<String, dynamic>>[].obs;
   var isLoading = false.obs;
 
@@ -20,45 +20,79 @@ class TenderDetailsOwnerController extends GetxController {
     fetchOffers();
   }
 
-  Future<void> initializeTender() async {
+  @override
+  void onClose() {
+    // Cancel Firestore subscriptions if any
+    super.onClose();
+  }
+
+  void initializeTender() {
     final args = Get.arguments;
     if (args is TenderModel) {
-      tender = args;
+      tender.value = args;
+      _listenToTenderUpdates(args.id);
     } else if (args is Map && args['tenderId'] != null) {
       isLoading.value = true;
-      final fetchedTender = await firebaseService.getTenderById(
-        args['tenderId'],
-      );
-      if (fetchedTender != null) {
-        tender = fetchedTender;
-      } else {
-        Get.snackbar('error'.tr(), 'tender_not_found'.tr());
-        Get.back();
-      }
-      isLoading.value = false;
+      _listenToTenderUpdates(args['tenderId']);
+    } else {
+      Get.snackbar('error'.tr(), 'tender_not_found'.tr());
+      Get.back();
     }
+  }
+
+  void _listenToTenderUpdates(String tenderId) {
+    firebaseService.firestore
+        .collection('projects')
+        .doc(tenderId)
+        .snapshots()
+        .listen(
+          (snapshot) async {
+            if (snapshot.exists) {
+              tender.value = TenderModel.fromJson(
+                snapshot.data()!,
+                snapshot.id,
+              );
+              isLoading.value = false;
+            } else {
+              Get.snackbar('error'.tr(), 'tender_not_found'.tr());
+              Get.back();
+            }
+          },
+          onError: (e) {
+            debugPrint('Error listening to tender updates: $e');
+            Get.snackbar('error'.tr(), 'tender_not_found'.tr());
+            isLoading.value = false;
+            Get.back();
+          },
+        );
   }
 
   void fetchOffers() {
     final userId = firebaseService.auth.currentUser?.uid;
-    if (userId != null && tender.userId == userId) {
+    if (userId != null && tender.value?.userId == userId) {
       firebaseService.firestore
           .collection('projects')
-          .doc(tender.id)
+          .doc(tender.value?.id)
           .collection('offers')
           .snapshots()
-          .listen((snapshot) {
-            offers.assignAll(
-              snapshot.docs
-                  .map((doc) => {...doc.data(), 'id': doc.id})
-                  .toList(),
-            );
-          });
+          .listen(
+            (snapshot) {
+              offers.assignAll(
+                snapshot.docs
+                    .map((doc) => {...doc.data(), 'id': doc.id})
+                    .toList(),
+              );
+            },
+            onError: (e) {
+              debugPrint('Error fetching offers: $e');
+              Get.snackbar('error'.tr(), 'failed_to_fetch_offers'.tr());
+            },
+          );
     }
   }
 
   Future<void> updateOfferStatus(String offerId, String status) async {
-    if (tender.stage != 'evaluated') {
+    if (tender.value?.stage != 'evaluated') {
       Get.snackbar('error'.tr(), 'cannot_update_offer_status'.tr());
       return;
     }
@@ -66,12 +100,11 @@ class TenderDetailsOwnerController extends GetxController {
     try {
       await firebaseService.firestore
           .collection('projects')
-          .doc(tender.id)
+          .doc(tender.value!.id)
           .collection('offers')
           .doc(offerId)
           .update({'status': status});
       final offer = offers.firstWhere((o) => o['id'] == offerId);
-      // Fetch contractor's deviceToken
       final contractorDoc = await firebaseService.firestore
           .collection('users')
           .doc(offer['contractorId'])
@@ -85,8 +118,8 @@ class TenderDetailsOwnerController extends GetxController {
           deviceToken,
           'offer_status_updated'.tr(),
           status == 'accepted'
-              ? 'offer_accepted_notification'.tr()
-              : 'offer_rejected_notification'.tr(),
+              ? '${'offer_accepted_notification'.tr()}${tender.value!.projectName}'
+              : '${'offer_rejected_notification'.tr()}${tender.value!.projectName}',
         );
       }
       Get.snackbar(
@@ -113,34 +146,21 @@ class TenderDetailsOwnerController extends GetxController {
       'execution',
       'completed',
     ];
-    final currentIndex = validStages.indexOf(tender.stage);
+    final currentIndex = validStages.indexOf(tender.value!.stage);
     final newIndex = validStages.indexOf(newStage);
     if (newIndex <= currentIndex || newIndex > currentIndex + 1) {
       Get.snackbar('error'.tr(), 'invalid_stage_transition'.tr());
       return;
     }
-    /* if (tender.stage ==
-        'announced' /* &&
-        newStage ==
-            'envelope_opened' */ /* &&
-        tender.endDate.isAfter(DateTime.now()) */ ) {
-      Get.snackbar('error'.tr(), 'cannot_open_envelopes_before_end_date'.tr());
-      return;
-    } */
     isLoading.value = true;
     try {
       await firebaseService.firestore
           .collection('projects')
-          .doc(tender.id)
+          .doc(tender.value!.id)
           .update({
             'stage': newStage,
             'updatedAt': Timestamp.fromDate(DateTime.now()),
           });
-      tender = TenderModel.fromJson({
-        ...tender.toJson(),
-        'stage': newStage,
-      }, tender.id);
-      // Notify all contractors who submitted offers
       for (var offer in offers) {
         final contractorDoc = await firebaseService.firestore
             .collection('users')
@@ -153,8 +173,8 @@ class TenderDetailsOwnerController extends GetxController {
           );
           await firebaseService.sendNotification(
             deviceToken,
-            'tender_stage_updated'.tr(),
-            'stage_updated_notification'.tr(),
+            '${'tender_stage_updated'.tr()}${tender.value?.projectName}',
+            '${'stage_updated_notification'.tr()}${tender.value?.projectName}',
           );
         }
       }
@@ -174,7 +194,7 @@ class TenderDetailsOwnerController extends GetxController {
     try {
       await firebaseService.firestore
           .collection('projects')
-          .doc(tender.id)
+          .doc(tender.value!.id)
           .collection('reports')
           .add({
             'type': 'envelope_opening',

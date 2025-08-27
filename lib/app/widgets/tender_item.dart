@@ -41,7 +41,7 @@ class TenderItemWidget extends StatelessWidget {
         margin: EdgeInsets.symmetric(vertical: 1.h),
         padding: EdgeInsets.all(3.w),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
+          color: Get.theme.scaffoldBackgroundColor,
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
@@ -99,7 +99,9 @@ class TenderItemWidget extends StatelessWidget {
                 // Content
                 Expanded(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: (Get.locale?.languageCode == 'ar')
+                        ? CrossAxisAlignment.start
+                        : CrossAxisAlignment.end,
                     children: [
                       // Service type and category
                       FittedBox(

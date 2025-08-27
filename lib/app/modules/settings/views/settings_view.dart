@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
+import 'package:mounakassat_dz/app/routes/app_pages.dart';
 import 'package:mounakassat_dz/app/widgets/custom_appbar.dart';
 
 import '../../../../utils/theme_config.dart';
@@ -38,6 +39,7 @@ class SettingsView extends StatelessWidget {
                     trailing: DropdownButton<Locale>(
                       value: context.locale,
                       underline: Container(),
+                      dropdownColor: Get.theme.scaffoldBackgroundColor,
                       items: const [Locale('ar'), Locale('fr'), Locale('en')]
                           .map(
                             (locale) => DropdownMenuItem(
@@ -48,8 +50,9 @@ class SettingsView extends StatelessWidget {
                                     : locale.languageCode == 'fr'
                                     ? 'french'.tr()
                                     : 'english'.tr(),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: 'NotoKufiArabic',
+                                  color: Get.textTheme.bodyMedium?.color,
                                 ),
                               ),
                             ),
@@ -91,7 +94,7 @@ class SettingsView extends StatelessWidget {
                     title: 'logout'.tr(),
                     onTap: () async {
                       await authController.firebaseService.signOut();
-                      Get.offAllNamed('/login');
+                      Get.offAllNamed(Routes.DASHBOARD);
                     },
                     textColor: Colors.red,
                     iconColor: Colors.red,
@@ -108,7 +111,7 @@ class SettingsView extends StatelessWidget {
                     icon: Icons.info_outline,
                     title: 'version'.tr(),
                     trailing: Text(
-                      '1.0.0', // Replace with your actual version
+                      '1.0.0',
                       style: TextStyle(
                         color: Theme.of(context).hintColor,
                         fontFamily: 'NotoKufiArabic',

@@ -224,7 +224,25 @@
   "stage_updated_notification": "L'étape de l'appel d'offres a été mise à jour pour le projet"
  ,"publishing_tender": "Publication de l'appel d'offres en cours",
   "unsupported_file_type": "Type de fichier non pris en charge",
-  "unsupported_image_type": "Type d'image non pris en charge"
+  "unsupported_image_type": "Type d'image non pris en charge",
+  "created_at": "Date de création",
+  "favorites": "Favoris",
+  "subscription": "Abonnement",
+  "no_favorites": "Aucun favori"
    
+  ,
+  "upload_document": "Télécharger le document",
+  "remove_document": "Supprimer le document","submitting_offer": "Soumission de l'offre en cours...",
+  "please_enter_execution_duration": "Veuillez entrer la durée d'exécution",
+  "invalid_execution_duration": "Durée d'exécution invalide","my_projects":"Mes projets",
+   "from": "De",
+  "to": "À",
+  "add_to_favorites": "Ajouter aux favoris",
+  "favorite": "Favori",
+  "app_settings": "Paramètres de l'application",
+  "account": "Compte",
+  "about_app": "À propos de l'application",
+  "version": "Version",
+  "privacy_policy": "Politique de confidentialité"
   
 }

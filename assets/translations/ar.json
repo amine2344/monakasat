@@ -49,7 +49,8 @@
   "generate_report": "إعداد محضر",
   "evaluation_criteria": "معايير التقييم",
   "select_winner": "اختيار الفائز",
-  "upload_contract": "رفع العقد",
+  "upload_contract": "رفع العقد","submitting_offer": "جاري تقديم العرض...",
+  "my_projects":"مشاريعي",
   "progress_report": "تقرير التقدم",
   "progress_percentage": "نسبة التقدم",
   "final_evaluation": "التقييم النهائي",
@@ -251,7 +252,22 @@
   "stage_updated_notification": "تم تحديث مرحلة الصفقة للمشروع",
   "publishing_tender": "جاري نشر الصفقة",
   "unsupported_file_type": "نوع الملف غير مدعوم",
-  "unsupported_image_type": "نوع الصورة غير مدعوم"
+  "unsupported_image_type": "نوع الصورة غير مدعوم",
+  "created_at": "تاريخ الإنشاء",
+  "favorites": "المفضلات",
+  "subscription": "الاشتراك",
+  "no_favorites": "لا توجد مفضلات",
+  "upload_document": "رفع المستند",
+  "remove_document": "إزالة المستند",
+  "please_enter_execution_duration": "الرجاء إدخال مدة التنفيذ",
+  "invalid_execution_duration": "مدة التنفيذ غير صالحة",
+  
+  "app_settings": "إعدادات التطبيق",
+  "account": "الحساب",
+  "about_app": "عن التطبيق",
+  "version": "الإصدار",
+  "privacy_policy": "سياسة الخصوصية"
+  
   
  
 }

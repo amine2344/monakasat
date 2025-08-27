@@ -15,6 +15,8 @@ class UserModel {
   final String? companyPhone;
   final DateTime? createdAt;
   final String? deviceToken;
+  final List<String>? favorites;
+  final String? subscription;
 
   UserModel({
     required this.id,
@@ -31,6 +33,8 @@ class UserModel {
     this.companyPhone,
     this.createdAt,
     this.deviceToken,
+    this.favorites,
+    this.subscription,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json, String id) {
@@ -53,6 +57,10 @@ class UserModel {
           ? DateTime.tryParse(json['createdAt'] as String)
           : null,
       deviceToken: json['deviceToken'],
+      favorites: json['favorites'] != null
+          ? List<String>.from(json['favorites'])
+          : null,
+      subscription: json['subscription'],
     );
   }
 
@@ -71,6 +79,8 @@ class UserModel {
       'companyPhone': companyPhone,
       'createdAt': createdAt?.toIso8601String(),
       'deviceToken': deviceToken,
+      'favorites': favorites,
+      'subscription': subscription,
     };
   }
 

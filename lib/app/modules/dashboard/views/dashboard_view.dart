@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
+import 'package:mounakassat_dz/app/modules/auth/controllers/auth_controller.dart';
 import 'package:mounakassat_dz/app/modules/dashboard/views/drawer.dart';
 import 'package:mounakassat_dz/app/modules/notifications/views/notifications_view.dart';
 import 'package:mounakassat_dz/app/routes/app_pages.dart';
@@ -97,7 +98,11 @@ class DashboardView extends GetView<DashboardController> {
                           ),
                           BottomNavigationBarItem(
                             icon: const Icon(Icons.local_offer),
-                            label: 'my_offers'.tr(),
+                            label:
+                                Get.find<AuthController>().currentUser?.role ==
+                                    'contractor'
+                                ? 'my_offers'.tr()
+                                : 'my_projects'.tr(),
                           ),
                           BottomNavigationBarItem(
                             icon: const Icon(Icons.notifications),

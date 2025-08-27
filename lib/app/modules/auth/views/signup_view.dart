@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
@@ -438,70 +439,79 @@ class SignUpView extends GetView<AuthController> {
                                 ),
                               ),
                             ),
-                          CustomButton(
-                            text: controller.currentStep.value == 1
-                                ? 'next'.tr()
-                                : 'signup'.tr(),
-                            trailingIcon: controller.currentStep.value == 1
-                                ? Icons.arrow_forward
-                                : Icons.person_add,
-                            backgroundColor: primaryColor,
-                            textColor: Colors.white,
-                            iconColor: Colors.white,
-                            fixedSize: controller.currentStep.value != 1
-                                ? Size(50.w, 8.h)
-                                : Size(70.w, 8.h),
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                              horizontal: 24,
-                            ),
-                            borderRadius: 8,
-                            onPressed: () {
-                              if (formKey.currentState!.validate()) {
-                                if (controller.currentStep.value == 1) {
-                                  controller.email.value = emailController.text;
-                                  controller.phone.value = phoneController.text;
-                                  controller.password.value =
-                                      passwordController.text;
-                                  controller.confirmPassword.value =
-                                      confirmPasswordController.text;
-                                  controller.nextStep();
-                                } else {
-                                  if (controller.selectedRole.value ==
-                                      'contractor') {
-                                    controller.name.value = nameController.text;
-                                    controller.prename.value =
-                                        prenameController.text;
-                                    controller.wilaya.value =
-                                        wilayaController.text;
-                                    controller.activitySector.value =
-                                        activitySectorController.text;
-                                    if (controller.name.value.isEmpty ||
-                                        controller.prename.value.isEmpty ||
-                                        controller.wilaya.value.isEmpty ||
-                                        controller
-                                            .activitySector
-                                            .value
-                                            .isEmpty) {
-                                      Get.snackbar(
-                                        'error'.tr(),
-                                        'please_fill_all_fields'.tr(),
-                                      );
-                                      return;
+                          controller.isLoading.value
+                              ? CupertinoActivityIndicator(color: primaryColor)
+                              : CustomButton(
+                                  text: controller.currentStep.value == 1
+                                      ? 'next'.tr()
+                                      : 'signup'.tr(),
+                                  trailingIcon:
+                                      controller.currentStep.value == 1
+                                      ? Icons.arrow_forward
+                                      : Icons.person_add,
+                                  backgroundColor: primaryColor,
+                                  textColor: Colors.white,
+                                  iconColor: Colors.white,
+                                  fixedSize: controller.currentStep.value != 1
+                                      ? Size(50.w, 8.h)
+                                      : Size(70.w, 8.h),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                    horizontal: 24,
+                                  ),
+                                  borderRadius: 8,
+                                  onPressed: () {
+                                    if (formKey.currentState!.validate()) {
+                                      if (controller.currentStep.value == 1) {
+                                        controller.email.value =
+                                            emailController.text;
+                                        controller.phone.value =
+                                            phoneController.text;
+                                        controller.password.value =
+                                            passwordController.text;
+                                        controller.confirmPassword.value =
+                                            confirmPasswordController.text;
+                                        controller.nextStep();
+                                      } else {
+                                        if (controller.selectedRole.value ==
+                                            'contractor') {
+                                          controller.name.value =
+                                              nameController.text;
+                                          controller.prename.value =
+                                              prenameController.text;
+                                          controller.wilaya.value =
+                                              wilayaController.text;
+                                          controller.activitySector.value =
+                                              activitySectorController.text;
+                                          if (controller.name.value.isEmpty ||
+                                              controller
+                                                  .prename
+                                                  .value
+                                                  .isEmpty ||
+                                              controller.wilaya.value.isEmpty ||
+                                              controller
+                                                  .activitySector
+                                                  .value
+                                                  .isEmpty) {
+                                            Get.snackbar(
+                                              'error'.tr(),
+                                              'please_fill_all_fields'.tr(),
+                                            );
+                                            return;
+                                          }
+                                        } else {
+                                          controller.companyName.value =
+                                              companyNameController.text;
+                                          controller.companyAddress.value =
+                                              companyAddressController.text;
+                                          controller.companyPhone.value =
+                                              companyPhoneController.text;
+                                        }
+                                        controller.signUp();
+                                      }
                                     }
-                                  } else {
-                                    controller.companyName.value =
-                                        companyNameController.text;
-                                    controller.companyAddress.value =
-                                        companyAddressController.text;
-                                    controller.companyPhone.value =
-                                        companyPhoneController.text;
-                                  }
-                                  controller.signUp();
-                                }
-                              }
-                            },
-                          ),
+                                  },
+                                ),
                         ],
                       ),
                       const SizedBox(height: 16),
