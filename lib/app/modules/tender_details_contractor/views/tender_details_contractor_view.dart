@@ -277,116 +277,108 @@ class TenderDetailsWidget extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 1.h),
-                          Card(
-                            color: Colors.white.withOpacity(0.9),
-                            margin: EdgeInsets.symmetric(vertical: 1.h),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Directionality(
-                              textDirection: ui.TextDirection.rtl,
-                              child: ListTile(
-                                contentPadding: EdgeInsets.all(2.w),
+                          Directionality(
+                            textDirection: ui.TextDirection.rtl,
+                            child: ListTile(
+                              contentPadding: EdgeInsets.all(2.w),
 
-                                title: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.person,
-                                      color: primaryColor,
-                                      size: 14.sp,
-                                    ),
-                                    SizedBox(width: 2.w),
-                                    Expanded(
-                                      child: Text(
-                                        controller
-                                                .userOffer
-                                                .value!['contractorName'] ??
-                                            'Unknown',
-                                        style: TextStyle(
-                                          fontFamily: 'NotoKufiArabic',
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.w600,
-                                          color: primaryColor,
-                                        ),
+                              title: Row(
+                                children: [
+                                  Icon(
+                                    Icons.person,
+                                    color: primaryColor,
+                                    size: 14.sp,
+                                  ),
+                                  SizedBox(width: 2.w),
+                                  Expanded(
+                                    child: Text(
+                                      controller
+                                              .userOffer
+                                              .value!['contractorName'] ??
+                                          'Unknown',
+                                      style: TextStyle(
+                                        fontFamily: 'NotoKufiArabic',
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: primaryColor,
                                       ),
                                     ),
-                                  ],
-                                ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  textDirection: ui.TextDirection.rtl,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.monetization_on,
-                                          color: Colors.grey[700],
-                                          size: 14.sp,
+                                  ),
+                                ],
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                textDirection: ui.TextDirection.rtl,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.monetization_on,
+                                        color: Colors.grey[700],
+                                        size: 14.sp,
+                                      ),
+                                      SizedBox(width: 2.w),
+                                      Text(
+                                        NumberFormat.currency(
+                                          locale: 'ar',
+                                          symbol: 'DZD ',
+                                        ).format(
+                                          controller
+                                              .userOffer
+                                              .value!['offerAmount'],
                                         ),
-                                        SizedBox(width: 2.w),
-                                        Text(
-                                          NumberFormat.currency(
-                                            locale: 'ar',
-                                            symbol: 'DZD ',
-                                          ).format(
-                                            controller
-                                                .userOffer
-                                                .value!['offerAmount'],
-                                          ),
+                                        style: TextStyle(
+                                          fontFamily: 'NotoKufiArabic',
+                                          fontSize: 15.sp,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.description,
+                                        color: Colors.grey[700],
+                                        size: 14.sp,
+                                      ),
+                                      SizedBox(width: 2.w),
+                                      Expanded(
+                                        child: Text(
+                                          controller
+                                                  .userOffer
+                                                  .value!['offerDetails'] ??
+                                              'N/A',
                                           style: TextStyle(
                                             fontFamily: 'NotoKufiArabic',
-                                            fontSize: 13.sp,
+                                            fontSize: 15.sp,
                                             color: Colors.grey[700],
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.description,
-                                          color: Colors.grey[700],
-                                          size: 14.sp,
-                                        ),
-                                        SizedBox(width: 2.w),
-                                        Expanded(
-                                          child: Text(
-                                            controller
-                                                    .userOffer
-                                                    .value!['offerDetails'] ??
-                                                'N/A',
-                                            style: TextStyle(
-                                              fontFamily: 'NotoKufiArabic',
-                                              fontSize: 13.sp,
-                                              color: Colors.grey[700],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.info,
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.info,
+                                        color: Colors.grey[600],
+                                        size: 14.sp,
+                                      ),
+                                      SizedBox(width: 2.w),
+                                      Text(
+                                        controller.userOffer.value!['status']
+                                            .toString()
+                                            .tr(),
+                                        style: TextStyle(
+                                          fontFamily: 'NotoKufiArabic',
+                                          fontSize: 15.sp,
                                           color: Colors.grey[600],
-                                          size: 14.sp,
                                         ),
-                                        SizedBox(width: 2.w),
-                                        Text(
-                                          controller
-                                                  .userOffer
-                                                  .value!['status'] ??
-                                              'pending',
-                                          style: TextStyle(
-                                            fontFamily: 'NotoKufiArabic',
-                                            fontSize: 13.sp,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
                           ),

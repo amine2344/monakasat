@@ -145,11 +145,13 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.TENDER_DETAILS_OWNER,
+      transition: Transition.rightToLeftWithFade,
       page: () => const TenderDetailsOwnerView(),
       binding: TenderDetailsOwnerBinding(),
     ),
     GetPage(
       name: _Paths.TENDER_DETAILS_CONTRACTOR,
+      transition: Transition.rightToLeftWithFade,
       page: () => const TenderDetailsContractorView(),
       binding: TenderDetailsContractorBinding(),
     ),

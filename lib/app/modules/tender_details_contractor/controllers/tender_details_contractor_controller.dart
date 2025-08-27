@@ -73,7 +73,7 @@ class TenderDetailsContractorController extends GetxController {
           .collection('offers')
           .add({
             'contractorId': userId,
-            'contractorName': authController.name.value,
+            'contractorName': authController.user.value?.name,
             'offerAmount': double.parse(offerAmount),
             'offerDetails': offerDetails,
             'submittedAt': DateTime.now(),

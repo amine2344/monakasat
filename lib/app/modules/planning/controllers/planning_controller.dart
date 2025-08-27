@@ -36,28 +36,36 @@ class PlanningController extends GetxController {
     super.onInit();
     final projectId = Get.arguments?['projectId'] as String?;
     if (projectId != null) {
-      firebaseService.firestore.collection('projects').doc(projectId).get().then((
-        doc,
-      ) {
-        if (doc.exists) {
-          final data = doc.data()!;
-          projectNameController.text = data['projectName'] ?? '';
-          serviceTypeController.text = data['serviceType'] ?? '';
-          requirementsController.text = data['requirements'] ?? '';
-          budgetController.text = data['budget']?.toString() ?? '';
-          legalRequirementsController.text = data['legalRequirements'] ?? '';
-          categoryController.text = data['category'] ?? '';
-          wilayaController.text = data['wilaya'] ?? '';
-          startDate.value = (data['startDate'] as Timestamp?)?.toDate();
-          endDate.value = (data['endDate'] as Timestamp?)?.toDate();
-          folderId.value = data['folderId'];
-          // Load featured image URL if it exists
-          if (data['featuredImageUrl'] != null) {
-            // Since we can't reload the FilePickerResult, we store the URL for display purposes
-            // The actual FilePickerResult will be null unless a new image is selected
-          }
-        }
-      });
+      isLoading.value = true;
+      firebaseService.firestore
+          .collection('projects')
+          .doc(projectId)
+          .get()
+          .then(
+            (doc) {
+              if (doc.exists) {
+                final data = doc.data()!;
+                projectNameController.text = data['projectName'] ?? '';
+                serviceTypeController.text = data['serviceType'] ?? '';
+                requirementsController.text = data['requirements'] ?? '';
+                budgetController.text = data['budget']?.toString() ?? '';
+                legalRequirementsController.text =
+                    data['legalRequirements'] ?? '';
+                categoryController.text = data['category'] ?? '';
+                wilayaController.text = data['wilaya'] ?? '';
+                startDate.value = (data['startDate'] as Timestamp?)?.toDate();
+                endDate.value = (data['endDate'] as Timestamp?)?.toDate();
+                folderId.value = data['folderId'];
+                // Note: Cannot reload FilePickerResult for documentUrl/featuredImageUrl
+              }
+              isLoading.value = false;
+            },
+            onError: (e) {
+              debugPrint('Error loading project: $e');
+              Get.snackbar('error'.tr(), 'failed_to_load_project'.tr());
+              isLoading.value = false;
+            },
+          );
     }
   }
 
@@ -183,9 +191,9 @@ class PlanningController extends GetxController {
         'requirements': requirementsController.text,
         'budget': budget,
         'legalRequirements': legalRequirementsController.text,
-        'startDate': startDate.value,
-        'endDate': endDate.value,
-        'createdAt': DateTime.now(),
+        'startDate': Timestamp.fromDate(startDate.value!),
+        'endDate': Timestamp.fromDate(endDate.value!),
+        'createdAt': Timestamp.fromDate(DateTime.now()),
         'stage': 'announced',
         'documentName': selectedFile.value?.files.single.name,
         'documentUrl': documentUrl,
@@ -225,10 +233,12 @@ class PlanningController extends GetxController {
           debugPrint(
             'Sending notification to contractor: ${doc.id}, token: $deviceToken',
           );
-          await FirebaseService().sendNotification(
+          await firebaseService.sendNotification(
             deviceToken,
             'new_tender_published'.tr(),
-            'tender_published_body'.tr(args: [projectNameController.text]),
+            "${'tender_published_body'.tr()}: ${projectNameController.text}",
+
+            /* data: {'tenderId': projectId}, */
           );
         }
       }

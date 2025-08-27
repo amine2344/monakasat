@@ -1,21 +1,21 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
+import '../../../../storage/app.storage.dart';
+import '../../../data/models/user_model.dart';
 import '../../../data/services/firebase_service.dart';
 import '../../../routes/app_pages.dart';
 
 class AuthController extends GetxController {
   final FirebaseService firebaseService = Get.find<FirebaseService>();
+  final AppStorage appStorage = AppStorage();
   var isLoading = false.obs;
   var selectedRole = 'contractor'.obs;
-  var userName = ''.obs; // Added for TenderDetailsContractorController
-  var profilePhotoUrl = ''.obs;
-  var confirmPassword = ''.obs;
-
   var currentStep = 1.obs;
   RxBool isPasswordHide = true.obs;
+  var user = Rxn<UserModel>();
+  var confirmPassword = ''.obs;
+
   // Step 1 fields
   var email = ''.obs;
   var phone = ''.obs;
@@ -32,6 +32,8 @@ class AuthController extends GetxController {
   var companyAddress = ''.obs;
   var companyPhone = ''.obs;
 
+  UserModel? get currentUser => user.value;
+
   @override
   void onInit() {
     super.onInit();
@@ -46,52 +48,63 @@ class AuthController extends GetxController {
   Future<void> loadUserData() async {
     try {
       isLoading.value = true;
-      final user = firebaseService.auth.currentUser;
-      if (user != null) {
-        final userDoc = await firebaseService.firestore
-            .collection('users')
-            .doc(user.uid)
-            .get();
-        if (userDoc.exists) {
-          final data = userDoc.data()!;
-          email.value = data['email'] ?? '';
-          phone.value = data['phone'] ?? '';
-          selectedRole.value = data['role'] ?? 'contractor';
-          profilePhotoUrl.value = data['profilePhotoUrl'] ?? '';
-          userName.value = selectedRole.value == 'contractor'
-              ? '${data['prename'] ?? ''} ${data['name'] ?? ''}'.trim()
-              : data['companyName'] ?? '';
-          if (selectedRole.value == 'contractor') {
-            name.value = data['name'] ?? '';
-            prename.value = data['prename'] ?? '';
-            wilaya.value = data['wilaya'] ?? '';
-            activitySector.value = data['activitySector'] ?? '';
-          } else {
-            companyName.value = data['companyName'] ?? '';
-            companyAddress.value = data['companyAddress'] ?? '';
-            companyPhone.value = data['companyPhone'] ?? '';
-          }
-          // Update FCM token
-          final token = await firebaseService.messaging.getToken();
-          if (token != null) {
-            await firebaseService.firestore
-                .collection('users')
-                .doc(user.uid)
-                .update({'deviceToken': token});
-            print('Updated FCM token for user ${user.uid}: $token');
-          }
+      final authUser = firebaseService.auth.currentUser;
+      if (authUser != null) {
+        // Check SharedPreferences first
+        UserModel? storedUser = await appStorage.getUser(authUser.uid);
+        if (storedUser != null) {
+          user.value = storedUser;
+          selectedRole.value = storedUser.role;
+          debugPrint('Loaded user from SharedPreferences: ${storedUser.email}');
         } else {
-          resetFields();
+          // Fetch from Firestore if not in SharedPreferences
+          final userDoc = await firebaseService.firestore
+              .collection('users')
+              .doc(authUser.uid)
+              .get();
+          if (userDoc.exists) {
+            final userData = UserModel.fromJson(userDoc.data()!, authUser.uid);
+            user.value = userData;
+            selectedRole.value = userData.role;
+            await appStorage.saveUser(authUser.uid, userData);
+            debugPrint(
+              'Loaded user from Firestore and saved to SharedPreferences: ${userData.email}',
+            );
+          } else {
+            resetFields();
+          }
         }
+        // Update FCM token asynchronously
+        _updateFcmToken(authUser.uid);
       } else {
         resetFields();
       }
     } catch (e) {
       debugPrint('ERROR LOADING USER DATA ==> ${e.toString()}');
-      Get.snackbar('error'.tr(), 'failed_to_load_user_data'.tr());
-      resetFields();
+      Get.showSnackbar(
+        GetSnackBar(
+          title: 'error'.tr(),
+          message: 'failed_to_load_user_data'.tr(),
+          duration: const Duration(seconds: 3),
+          snackPosition: SnackPosition.BOTTOM,
+        ),
+      );
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> _updateFcmToken(String userId) async {
+    try {
+      final token = await firebaseService.messaging.getToken();
+      if (token != null) {
+        await firebaseService.firestore.collection('users').doc(userId).update({
+          'deviceToken': token,
+        });
+        debugPrint('Updated FCM token for user $userId: $token');
+      }
+    } catch (e) {
+      debugPrint('Error updating FCM token: $e');
     }
   }
 
@@ -111,8 +124,7 @@ class AuthController extends GetxController {
     companyName.value = '';
     companyAddress.value = '';
     companyPhone.value = '';
-    profilePhotoUrl.value = '';
-    userName.value = '';
+    user.value = null;
     currentStep.value = 1;
   }
 
@@ -127,24 +139,51 @@ class AuthController extends GetxController {
   Future<void> login(String email, String password) async {
     try {
       isLoading.value = true;
-      final user = await firebaseService.login(email, password);
-      if (user != null) {
+      final authUser = await firebaseService.login(email, password);
+      if (authUser != null) {
         final userDoc = await firebaseService.firestore
             .collection('users')
-            .doc(user.uid)
+            .doc(authUser.uid)
             .get();
-        final userRole = userDoc.data()?['role'] ?? 'contractor';
+
+        if (!userDoc.exists) {
+          throw Exception('User document not found in Firestore');
+        }
+
+        final userData = UserModel.fromJson(userDoc.data()!, authUser.uid);
+        final userRole = userData.role;
+
         if (userRole == selectedRole.value) {
-          await loadUserData();
+          user.value = userData;
+
+          await appStorage.saveUser(authUser.uid, userData);
+
+          debugPrint('✅ Saved latest user data to AppStorage');
+
           Get.offAllNamed(Routes.DASHBOARD);
         } else {
-          Get.snackbar('error'.tr(), 'role_mismatch'.tr());
+          // ❌ Role mismatch
+          Get.showSnackbar(
+            GetSnackBar(
+              title: 'error'.tr(),
+              message: 'role_mismatch'.tr(),
+              duration: const Duration(seconds: 3),
+              snackPosition: SnackPosition.BOTTOM,
+            ),
+          );
           await firebaseService.signOut();
         }
       }
     } catch (e) {
       debugPrint('ERROR LOGIN ==> ${e.toString()}');
-      Get.snackbar('error'.tr(), 'login_failed'.tr());
+      Get.showSnackbar(
+        GetSnackBar(
+          title: 'error'.tr(),
+          message: 'login_failed'.tr(),
+          duration: const Duration(seconds: 3),
+          snackPosition: SnackPosition.BOTTOM,
+        ),
+      );
     } finally {
       isLoading.value = false;
     }
@@ -158,30 +197,49 @@ class AuthController extends GetxController {
             email: email.value,
             password: password.value,
           );
-      final user = userCredential.user;
-      if (user != null) {
-        await firebaseService.firestore.collection('users').doc(user.uid).set({
-          'email': email.value,
-          'phone': phone.value,
-          'role': selectedRole.value,
-          if (selectedRole.value == 'contractor') ...{
-            'name': name.value,
-            'prename': prename.value,
-            'wilaya': wilaya.value,
-            'activitySector': activitySector.value,
-          } else ...{
-            'companyName': companyName.value,
-            'companyAddress': companyAddress.value,
-            'companyPhone': companyPhone.value,
-          },
-          'createdAt': DateTime.now(),
-          'deviceToken': await firebaseService.messaging.getToken(),
-        });
-        await loadUserData();
+      final authUser = userCredential.user;
+      if (authUser != null) {
+        final userData = UserModel(
+          id: authUser.uid,
+          email: email.value,
+          phone: phone.value,
+          role: selectedRole.value,
+          name: selectedRole.value == 'contractor' ? name.value : null,
+          prename: selectedRole.value == 'contractor' ? prename.value : null,
+          wilaya: selectedRole.value == 'contractor' ? wilaya.value : null,
+          activitySector: selectedRole.value == 'contractor'
+              ? activitySector.value
+              : null,
+          companyName: selectedRole.value == 'project_owner'
+              ? companyName.value
+              : null,
+          companyAddress: selectedRole.value == 'project_owner'
+              ? companyAddress.value
+              : null,
+          companyPhone: selectedRole.value == 'project_owner'
+              ? companyPhone.value
+              : null,
+          createdAt: DateTime.now(),
+          deviceToken: await firebaseService.messaging.getToken(),
+        );
+        await firebaseService.firestore
+            .collection('users')
+            .doc(authUser.uid)
+            .set(userData.toJson());
+        user.value = userData;
+        await appStorage.saveUser(authUser.uid, userData);
         Get.offAllNamed(Routes.DASHBOARD);
       }
     } catch (e) {
-      Get.snackbar('error'.tr(), 'signup_failed'.tr());
+      Get.showSnackbar(
+        GetSnackBar(
+          title: 'error'.tr(),
+          message: 'signup_failed'.tr(),
+          duration: const Duration(seconds: 3),
+          snackPosition: SnackPosition.BOTTOM,
+        ),
+      );
+      debugPrint('ERROR SIGNUP ==> ${e.toString()}');
     } finally {
       isLoading.value = false;
     }

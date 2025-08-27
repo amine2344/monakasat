@@ -78,7 +78,9 @@ class CustomDrawer extends StatelessWidget {
             ),
             onTap: () {
               Get.back();
-              Get.toNamed(Routes.FAVORITE);
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Get.toNamed(Routes.FAVORITE);
+              });
             },
           ),
           ListTile(

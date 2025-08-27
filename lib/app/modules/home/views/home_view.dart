@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:sizer/sizer.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../../controllers/theme_controller.dart';
+import '../../../data/models/tender_model.dart';
 import '../../../widgets/tender_item.dart';
 import '../controllers/home_controller.dart';
 import '../../auth/controllers/auth_controller.dart';
@@ -22,7 +24,34 @@ class HomeView extends GetView<HomeController> {
         textDirection: Get.find<ThemeController>().textDirection.value,
         child: SafeArea(
           child: Obx(
-            () => controller.tenders.isEmpty
+            () => controller.isLoading.value
+                ? Skeletonizer(
+                    enabled: true,
+                    child: ListView.builder(
+                      padding: EdgeInsets.all(4.w),
+                      itemCount: 5, // Show 5 skeleton cards
+                      itemBuilder: (context, index) {
+                        return TenderItemWidget(
+                          tender: TenderModel(
+                            id: 'skeleton_$index',
+                            userId: '',
+                            projectName: 'Placeholder Project',
+                            serviceType: 'Placeholder Type',
+                            requirements: '',
+                            budget: 0.0,
+                            legalRequirements: '',
+                            startDate: DateTime.now(),
+                            endDate: DateTime.now(),
+                            createdAt: DateTime.now(),
+                            stage: 'announced',
+                          ),
+                          isProjectOwner: isProjectOwner,
+                          controller: controller,
+                        );
+                      },
+                    ),
+                  )
+                : controller.tenders.isEmpty
                 ? Center(
                     child: Text(
                       'no_tenders_available'.tr(),
@@ -51,7 +80,7 @@ class HomeView extends GetView<HomeController> {
                         ),
                       );
                     },
-                  ),
+                  ).paddingOnly(bottom: 4.h),
           ),
         ),
       ),

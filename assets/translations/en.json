@@ -211,11 +211,14 @@
   "end_date_before_start": "End date must be after start date",
   "cannot_open_envelopes_before_end_date": "Cannot open envelopes before the offer submission end date",
   
-  
+  "restricted_info": "Information is reserved for our subscribers",
   "mark_envelope_opened": "Open Envelopes",
   "complete_evaluation": "Complete Evaluation",
   "start_execution": "Start Execution",
   "complete_project": "Complete Project",
+    "new_tender_published": "New deal published",
+  "tender_published_body": "A new deal has been published, check it out!",
+  
   "cannot_update_offer_status": "Cannot update offer status outside evaluation stage",
   "stage_updated": "Stage updated",
   "stage_update_failed": "Failed to update stage",
@@ -227,5 +230,8 @@
   "offer_rejected_notification": "Your offer for the project has been rejected",
   "tender_stage_updated": "Tender stage updated",
   "stage_updated_notification": "Stage of tender has been updated for the project"
-
+,"publishing_tender": "Publishing the tender",
+  "unsupported_file_type": "Unsupported file type",
+  "unsupported_image_type": "Unsupported image type",
+  "publish_tender_failed": "Failed to publish tender"
 }

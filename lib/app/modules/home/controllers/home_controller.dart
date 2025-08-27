@@ -10,6 +10,7 @@ class HomeController extends GetxController {
   final AuthController authController = Get.find<AuthController>();
   var tenders = <TenderModel>[].obs;
   var favorites = <String>{}.obs;
+  RxBool isLoading = false.obs;
 
   @override
   void onInit() {
@@ -19,35 +20,65 @@ class HomeController extends GetxController {
   }
 
   void fetchTenders() {
-    firebaseService.getTenders().listen((tenderList) {
-      final isProjectOwner =
-          authController.selectedRole.value == 'project_owner';
-      tenders.assignAll(
-        tenderList
-            .where(
-              (tender) => isProjectOwner
-                  ? tender.userId == firebaseService.auth.currentUser?.uid
-                  : tender.stage == 'announced',
-            )
-            .toList(),
+    isLoading.value = true;
+    try {
+      firebaseService.getTenders().listen(
+        (tenderList) {
+          final isProjectOwner =
+              authController.selectedRole.value == 'project_owner';
+          tenders.assignAll(
+            tenderList
+                .where(
+                  (tender) => isProjectOwner
+                      ? tender.userId == firebaseService.auth.currentUser?.uid
+                      : tender.stage == 'announced',
+                )
+                .toList(),
+          );
+          isLoading.value = false;
+        },
+        onError: (e) {
+          Get.snackbar('error'.tr(), 'failed_to_load_tenders'.tr());
+          debugPrint('Error fetching tenders: $e');
+          isLoading.value = false;
+        },
       );
-    });
+    } catch (e) {
+      Get.snackbar('error'.tr(), 'failed_to_load_tenders'.tr());
+      debugPrint('Error fetching tenders: $e');
+      isLoading.value = false;
+    }
   }
 
   void fetchFavorites() {
     final userId = firebaseService.auth.currentUser?.uid;
     if (userId != null) {
-      firebaseService.firestore
-          .collection('users')
-          .doc(userId)
-          .snapshots()
-          .listen((doc) {
-            if (doc.exists) {
-              favorites.value = Set<String>.from(
-                doc.data()?['favorites'] ?? [],
-              );
-            }
-          });
+      isLoading.value = true;
+      try {
+        firebaseService.firestore
+            .collection('users')
+            .doc(userId)
+            .snapshots()
+            .listen(
+              (doc) {
+                if (doc.exists) {
+                  favorites.value = Set<String>.from(
+                    doc.data()?['favorites'] ?? [],
+                  );
+                }
+                isLoading.value = false;
+              },
+              onError: (e) {
+                Get.snackbar('error'.tr(), 'failed_to_load_favorites'.tr());
+                debugPrint('Error fetching favorites: $e');
+                isLoading.value = false;
+              },
+            );
+      } catch (e) {
+        Get.snackbar('error'.tr(), 'failed_to_load_favorites'.tr());
+        debugPrint('Error fetching favorites: $e');
+        isLoading.value = false;
+      }
     }
   }
 
@@ -73,6 +104,7 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       Get.snackbar('error'.tr(), 'favorite_update_failed'.tr());
+      debugPrint('Error updating favorite: $e');
     }
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:intl/intl.dart';
+import 'package:mounakassat_dz/app/modules/auth/controllers/auth_controller.dart';
 import 'package:sizer/sizer.dart';
 import 'package:mounakassat_dz/app/widgets/custom_appbar.dart';
 import 'package:mounakassat_dz/app/widgets/custom_button.dart';
@@ -16,11 +17,13 @@ import '../controllers/tender_details_owner_controller.dart';
 
 class TenderDetailsWidget extends StatelessWidget {
   final TenderModel tender;
+  final bool isProjectOwnerAccount;
   final TenderDetailsOwnerController controller;
 
   const TenderDetailsWidget({
     super.key,
     required this.tender,
+    required this.isProjectOwnerAccount,
     required this.controller,
   });
 
@@ -165,6 +168,166 @@ class TenderDetailsWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             textDirection: ui.TextDirection.rtl,
             children: [
+              // Tender details
+              Padding(
+                padding: EdgeInsets.all(3.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  textDirection: ui.TextDirection.rtl,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.title, color: primaryColor, size: 18.sp),
+                        SizedBox(width: 2.w),
+                        Expanded(
+                          child: Text(
+                            tender.projectName.toUpperCase(),
+                            style: TextStyle(
+                              fontFamily: 'NotoKufiArabic',
+                              fontWeight: FontWeight.w700,
+                              color: primaryColor,
+                              fontSize: 16.sp,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 1.5.h),
+                    Row(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: primaryColor,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  tender.category ?? 'N/A',
+                                  style: TextStyle(
+                                    fontFamily: 'NotoKufiArabic',
+                                    fontSize: 14.sp,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 1.h),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.location_on,
+                                color: Colors.grey[700],
+                                size: 16.sp,
+                              ),
+                              SizedBox(width: 2.w),
+                              Text(
+                                tender.wilaya ?? 'N/A',
+                                style: TextStyle(
+                                  fontFamily: 'NotoKufiArabic',
+                                  fontSize: 14.sp,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 1.h),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.monetization_on,
+                                color: Colors.grey[700],
+                                size: 16.sp,
+                              ),
+                              SizedBox(width: 2.w),
+                              Text(
+                                NumberFormat.currency(
+                                  locale: 'ar',
+                                  symbol: 'DZD ',
+                                ).format(tender.budget),
+                                style: TextStyle(
+                                  fontFamily: 'NotoKufiArabic',
+                                  fontSize: 14.sp,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 1.h),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.build,
+                                color: primaryColor,
+                                size: 16.sp,
+                              ),
+                              SizedBox(width: 2.w),
+                              Text(
+                                tender.serviceType,
+                                style: TextStyle(
+                                  fontFamily: 'NotoKufiArabic',
+                                  fontSize: 14.sp,
+                                  color: primaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (tender.documentName != null) ...[
+                      SizedBox(height: 1.h),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.file_present,
+                            color: Colors.blue,
+                            size: 16.sp,
+                          ),
+                          SizedBox(width: 2.w),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () => _launchDocument(tender.documentUrl),
+                              child: Text(
+                                tender.documentName!,
+                                style: TextStyle(
+                                  fontFamily: 'NotoKufiArabic',
+                                  fontSize: 14.sp,
+                                  color: Colors.blue,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              SizedBox(height: 2.h),
+
               // Timeline
               _buildTimeline(),
               SizedBox(height: 2.h),
@@ -200,398 +363,246 @@ class TenderDetailsWidget extends StatelessWidget {
               SizedBox(height: 2.h),
               Divider(color: Colors.grey[300]),
               SizedBox(height: 2.h),
-              // Tender details
-              Card(
-                color: Colors.white.withOpacity(0.9),
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(3.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    textDirection: ui.TextDirection.rtl,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.title, color: primaryColor, size: 18.sp),
-                          SizedBox(width: 2.w),
-                          Expanded(
-                            child: Text(
-                              tender.projectName.toUpperCase(),
-                              style: TextStyle(
-                                fontFamily: 'NotoKufiArabic',
-                                fontWeight: FontWeight.w700,
-                                color: primaryColor,
-                                fontSize: 16.sp,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 1.5.h),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.category,
-                                  color: Colors.grey[700],
-                                  size: 16.sp,
-                                ),
-                                SizedBox(width: 2.w),
-                                Text(
-                                  tender.category ?? 'N/A',
-                                  style: TextStyle(
-                                    fontFamily: 'NotoKufiArabic',
-                                    fontSize: 14.sp,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.location_on,
-                                  color: Colors.grey[700],
-                                  size: 16.sp,
-                                ),
-                                SizedBox(width: 2.w),
-                                Text(
-                                  tender.wilaya ?? 'N/A',
-                                  style: TextStyle(
-                                    fontFamily: 'NotoKufiArabic',
-                                    fontSize: 14.sp,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 1.h),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.monetization_on,
-                                  color: Colors.grey[700],
-                                  size: 16.sp,
-                                ),
-                                SizedBox(width: 2.w),
-                                Text(
-                                  NumberFormat.currency(
-                                    locale: 'ar',
-                                    symbol: 'DZD ',
-                                  ).format(tender.budget),
-                                  style: TextStyle(
-                                    fontFamily: 'NotoKufiArabic',
-                                    fontSize: 14.sp,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.build,
-                                  color: primaryColor,
-                                  size: 16.sp,
-                                ),
-                                SizedBox(width: 2.w),
-                                Text(
-                                  tender.serviceType,
-                                  style: TextStyle(
-                                    fontFamily: 'NotoKufiArabic',
-                                    fontSize: 14.sp,
-                                    color: primaryColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (tender.documentName != null) ...[
-                        SizedBox(height: 1.h),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.file_present,
-                              color: Colors.blue,
-                              size: 16.sp,
-                            ),
-                            SizedBox(width: 2.w),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () =>
-                                    _launchDocument(tender.documentUrl),
-                                child: Text(
-                                  tender.documentName!,
-                                  style: TextStyle(
-                                    fontFamily: 'NotoKufiArabic',
-                                    fontSize: 14.sp,
-                                    color: Colors.blue,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ],
+
+              // Offers section
+              if (isProjectOwnerAccount) ...[
+                Text(
+                  'offers_received'.tr(),
+                  style: TextStyle(
+                    fontFamily: 'NotoKufiArabic',
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    color: primaryColor,
                   ),
                 ),
-              ),
-              SizedBox(height: 2.h),
-              // Offers section
-              Text(
-                'offers_received'.tr(),
-                style: TextStyle(
-                  fontFamily: 'NotoKufiArabic',
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
-                  color: primaryColor,
-                ),
-              ),
-              SizedBox(height: 1.h),
-              Obx(
-                () => controller.offers.isEmpty
-                    ? Text(
-                        'no_offers_available'.tr(),
-                        style: TextStyle(
-                          fontFamily: 'NotoKufiArabic',
-                          fontSize: 14.sp,
-                          color: Colors.grey[700],
-                        ),
-                      )
-                    : ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: controller.offers.length,
-                        itemBuilder: (context, index) {
-                          final offer = controller.offers[index];
-                          return Card(
-                            color: Colors.white.withOpacity(0.9),
-                            margin: EdgeInsets.symmetric(vertical: 1.h),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: ListTile(
-                              contentPadding: EdgeInsets.all(2.w),
-                              title: Row(
-                                textDirection: ui.TextDirection.rtl,
-                                children: [
-                                  Icon(
-                                    Icons.person,
-                                    color: primaryColor,
-                                    size: 16.sp,
-                                  ),
-                                  SizedBox(width: 2.w),
-                                  Expanded(
-                                    child: Text(
-                                      offer['contractorName'] ?? 'Unknown',
-                                      style: TextStyle(
-                                        fontFamily: 'NotoKufiArabic',
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w600,
-                                        color: primaryColor,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                SizedBox(height: 1.h),
+                Obx(
+                  () => controller.offers.isEmpty
+                      ? Text(
+                          'no_offers_available'.tr(),
+                          style: TextStyle(
+                            fontFamily: 'NotoKufiArabic',
+                            fontSize: 14.sp,
+                            color: Colors.grey[700],
+                          ),
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: controller.offers.length,
+                          itemBuilder: (context, index) {
+                            final offer = controller.offers[index];
+                            return Card(
+                              color: Colors.white.withOpacity(0.9),
+                              margin: EdgeInsets.symmetric(vertical: 1.h),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                textDirection: ui.TextDirection.rtl,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.monetization_on,
-                                        color: Colors.grey[700],
-                                        size: 14.sp,
-                                      ),
-                                      SizedBox(width: 2.w),
-                                      Text(
-                                        NumberFormat.currency(
-                                          locale: 'ar',
-                                          symbol: 'DZD ',
-                                        ).format(offer['offerAmount']),
+                              child: ListTile(
+                                contentPadding: EdgeInsets.all(2.w),
+                                title: Row(
+                                  textDirection: ui.TextDirection.rtl,
+                                  children: [
+                                    Icon(
+                                      Icons.person,
+                                      color: primaryColor,
+                                      size: 16.sp,
+                                    ),
+                                    SizedBox(width: 2.w),
+                                    Expanded(
+                                      child: Text(
+                                        offer['contractorName'] ?? 'Unknown',
                                         style: TextStyle(
                                           fontFamily: 'NotoKufiArabic',
-                                          fontSize: 13.sp,
-                                          color: Colors.grey[700],
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w600,
+                                          color: primaryColor,
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.description,
-                                        color: Colors.grey[700],
-                                        size: 14.sp,
-                                      ),
-                                      SizedBox(width: 2.w),
-                                      Expanded(
-                                        child: Text(
-                                          offer['offerDetails'] ?? 'N/A',
+                                    ),
+                                  ],
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  textDirection: ui.TextDirection.rtl,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.monetization_on,
+                                          color: Colors.grey[700],
+                                          size: 14.sp,
+                                        ),
+                                        SizedBox(width: 2.w),
+                                        Text(
+                                          NumberFormat.currency(
+                                            locale: 'ar',
+                                            symbol: 'DZD ',
+                                          ).format(offer['offerAmount']),
                                           style: TextStyle(
                                             fontFamily: 'NotoKufiArabic',
                                             fontSize: 13.sp,
                                             color: Colors.grey[700],
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.info,
-                                        color: Colors.grey[600],
-                                        size: 14.sp,
-                                      ),
-                                      SizedBox(width: 2.w),
-                                      Text(
-                                        offer['status'].toString().tr(),
-                                        style: TextStyle(
-                                          fontFamily: 'NotoKufiArabic',
-                                          fontSize: 13.sp,
-                                          color: offer['status'] == 'accepted'
-                                              ? Colors.green
-                                              : offer['status'] == 'rejected'
-                                              ? Colors.red
-                                              : Colors.grey[600],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              trailing:
-                                  tender.stage == 'evaluated' &&
-                                      offer['status'] == 'pending'
-                                  ? Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      textDirection: ui.TextDirection.rtl,
+                                      ],
+                                    ),
+                                    Row(
                                       children: [
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.check,
-                                            color: Colors.green,
-                                            size: 16.sp,
-                                          ),
-                                          onPressed: () =>
-                                              controller.updateOfferStatus(
-                                                offer['id'],
-                                                'accepted',
-                                              ),
+                                        Icon(
+                                          Icons.description,
+                                          color: Colors.grey[700],
+                                          size: 14.sp,
                                         ),
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.close,
-                                            color: Colors.red,
-                                            size: 16.sp,
+                                        SizedBox(width: 2.w),
+                                        Expanded(
+                                          child: Text(
+                                            offer['offerDetails'] ?? 'N/A',
+                                            style: TextStyle(
+                                              fontFamily: 'NotoKufiArabic',
+                                              fontSize: 13.sp,
+                                              color: Colors.grey[700],
+                                            ),
                                           ),
-                                          onPressed: () =>
-                                              controller.updateOfferStatus(
-                                                offer['id'],
-                                                'rejected',
-                                              ),
                                         ),
                                       ],
-                                    )
-                                  : null,
-                            ),
-                          );
-                        },
+                                    ),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.info,
+                                          color: Colors.grey[600],
+                                          size: 14.sp,
+                                        ),
+                                        SizedBox(width: 2.w),
+                                        Text(
+                                          offer['status'].toString().tr(),
+                                          style: TextStyle(
+                                            fontFamily: 'NotoKufiArabic',
+                                            fontSize: 13.sp,
+                                            color: offer['status'] == 'accepted'
+                                                ? Colors.green
+                                                : offer['status'] == 'rejected'
+                                                ? Colors.red
+                                                : Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                trailing:
+                                    tender.stage == 'evaluated' &&
+                                        offer['status'] == 'pending'
+                                    ? Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        textDirection: ui.TextDirection.rtl,
+                                        children: [
+                                          IconButton(
+                                            icon: Icon(
+                                              Icons.check,
+                                              color: Colors.green,
+                                              size: 16.sp,
+                                            ),
+                                            onPressed: () =>
+                                                controller.updateOfferStatus(
+                                                  offer['id'],
+                                                  'accepted',
+                                                ),
+                                          ),
+                                          IconButton(
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                              size: 16.sp,
+                                            ),
+                                            onPressed: () =>
+                                                controller.updateOfferStatus(
+                                                  offer['id'],
+                                                  'rejected',
+                                                ),
+                                          ),
+                                        ],
+                                      )
+                                    : null,
+                              ),
+                            );
+                          },
+                        ),
+                ),
+                SizedBox(height: 2.h),
+                // Stage-specific actions
+                Column(
+                  children: [
+                    if (tender.stage ==
+                        'announced' /* &&
+                        tender.endDate.isBefore(DateTime.now()) */ )
+                      CustomButton(
+                        text: 'mark_envelope_opened'.tr(),
+                        trailingIcon: Icons.folder_open,
+                        backgroundColor: primaryColor,
+                        textColor: Colors.white,
+                        iconColor: Colors.white,
+                        fixedSize: Size(100.w, 8.h),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 2.h,
+                          horizontal: 4.w,
+                        ),
+                        borderRadius: 8,
+                        onPressed: () =>
+                            controller.updateTenderStage('envelope_opened'),
                       ),
-              ),
-              SizedBox(height: 2.h),
-              // Stage-specific actions
-              Column(
-                children: [
-                  if (tender.stage == 'announced' &&
-                      tender.endDate.isBefore(DateTime.now()))
-                    CustomButton(
-                      text: 'mark_envelope_opened'.tr(),
-                      trailingIcon: Icons.folder_open,
-                      backgroundColor: primaryColor,
-                      textColor: Colors.white,
-                      iconColor: Colors.white,
-                      fixedSize: Size(100.w, 8.h),
-                      padding: EdgeInsets.symmetric(
-                        vertical: 2.h,
-                        horizontal: 4.w,
+                    if (tender.stage == 'envelope_opened')
+                      CustomButton(
+                        text: 'complete_evaluation'.tr(),
+                        trailingIcon: Icons.check_circle,
+                        backgroundColor: primaryColor,
+                        textColor: Colors.white,
+                        iconColor: Colors.white,
+                        fixedSize: Size(100.w, 8.h),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 2.h,
+                          horizontal: 4.w,
+                        ),
+                        borderRadius: 8,
+                        onPressed: () =>
+                            controller.updateTenderStage('evaluated'),
                       ),
-                      borderRadius: 8,
-                      onPressed: () =>
-                          controller.updateTenderStage('envelope_opened'),
-                    ),
-                  if (tender.stage == 'envelope_opened')
-                    CustomButton(
-                      text: 'complete_evaluation'.tr(),
-                      trailingIcon: Icons.check_circle,
-                      backgroundColor: primaryColor,
-                      textColor: Colors.white,
-                      iconColor: Colors.white,
-                      fixedSize: Size(100.w, 8.h),
-                      padding: EdgeInsets.symmetric(
-                        vertical: 2.h,
-                        horizontal: 4.w,
+                    if (tender.stage == 'contract_signed')
+                      CustomButton(
+                        text: 'start_execution'.tr(),
+                        trailingIcon: Icons.play_arrow,
+                        backgroundColor: primaryColor,
+                        textColor: Colors.white,
+                        iconColor: Colors.white,
+                        fixedSize: Size(100.w, 8.h),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 2.h,
+                          horizontal: 4.w,
+                        ),
+                        borderRadius: 8,
+                        onPressed: () =>
+                            controller.updateTenderStage('execution'),
                       ),
-                      borderRadius: 8,
-                      onPressed: () =>
-                          controller.updateTenderStage('evaluated'),
-                    ),
-                  if (tender.stage == 'contract_signed')
-                    CustomButton(
-                      text: 'start_execution'.tr(),
-                      trailingIcon: Icons.play_arrow,
-                      backgroundColor: primaryColor,
-                      textColor: Colors.white,
-                      iconColor: Colors.white,
-                      fixedSize: Size(100.w, 8.h),
-                      padding: EdgeInsets.symmetric(
-                        vertical: 2.h,
-                        horizontal: 4.w,
+                    if (tender.stage == 'execution')
+                      CustomButton(
+                        text: 'complete_project'.tr(),
+                        trailingIcon: Icons.done_all,
+                        backgroundColor: primaryColor,
+                        textColor: Colors.white,
+                        iconColor: Colors.white,
+                        fixedSize: Size(100.w, 8.h),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 2.h,
+                          horizontal: 4.w,
+                        ),
+                        borderRadius: 8,
+                        onPressed: () =>
+                            controller.updateTenderStage('completed'),
                       ),
-                      borderRadius: 8,
-                      onPressed: () =>
-                          controller.updateTenderStage('execution'),
-                    ),
-                  if (tender.stage == 'execution')
-                    CustomButton(
-                      text: 'complete_project'.tr(),
-                      trailingIcon: Icons.done_all,
-                      backgroundColor: primaryColor,
-                      textColor: Colors.white,
-                      iconColor: Colors.white,
-                      fixedSize: Size(100.w, 8.h),
-                      padding: EdgeInsets.symmetric(
-                        vertical: 2.h,
-                        horizontal: 4.w,
-                      ),
-                      borderRadius: 8,
-                      onPressed: () =>
-                          controller.updateTenderStage('completed'),
-                    ),
-                ],
-              ),
+                  ],
+                ),
+              ],
 
               if (controller.isLoading.value) ...[
                 SizedBox(height: 2.h),
@@ -624,6 +635,9 @@ class TenderDetailsOwnerView extends GetView<TenderDetailsOwnerController> {
                 textDirection: Get.find<ThemeController>().textDirection.value,
                 child: TenderDetailsWidget(
                   tender: controller.tender,
+                  isProjectOwnerAccount:
+                      (Get.find<AuthController>().currentUser?.role !=
+                      'contractor'),
                   controller: controller,
                 ),
               ),

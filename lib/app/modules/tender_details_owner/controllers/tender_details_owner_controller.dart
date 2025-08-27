@@ -119,12 +119,14 @@ class TenderDetailsOwnerController extends GetxController {
       Get.snackbar('error'.tr(), 'invalid_stage_transition'.tr());
       return;
     }
-    if (tender.stage == 'announced' &&
-        newStage == 'envelope_opened' &&
-        tender.endDate.isAfter(DateTime.now())) {
+    /* if (tender.stage ==
+        'announced' /* &&
+        newStage ==
+            'envelope_opened' */ /* &&
+        tender.endDate.isAfter(DateTime.now()) */ ) {
       Get.snackbar('error'.tr(), 'cannot_open_envelopes_before_end_date'.tr());
       return;
-    }
+    } */
     isLoading.value = true;
     try {
       await firebaseService.firestore

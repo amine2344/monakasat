@@ -16,7 +16,9 @@ class MyOffersController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchMyOffers();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchMyOffers();
+    });
   }
 
   Future<void> fetchMyOffers() async {

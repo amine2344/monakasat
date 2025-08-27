@@ -25,9 +25,7 @@ class TenderItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isSubscribed =
-        FirebaseAuth.instance.currentUser !=
-        null; // Placeholder for subscription check
+    final isSubscribed = FirebaseAuth.instance.currentUser != null;
     return GestureDetector(
       onTap: () {
         FirebaseAuth.instance.currentUser != null

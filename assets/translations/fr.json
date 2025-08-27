@@ -206,7 +206,9 @@
  ,
   "mark_envelope_opened": "Ouvrir les plis",
   "complete_evaluation": "Terminer l'évaluation",
-  "start_execution": "Démarrer l'exécution",
+  "start_execution": "Démarrer l'exécution","restricted_info": "Les informations sont réservées à nos abonnés",
+   "new_tender_published": "Nouvelle affaire publiée",
+  "tender_published_body": "Une nouvelle affaire a été publiée, allez la voir !",
   "cannot_open_envelopes_before_end_date": "Impossible d'ouvrir les plis avant la date de fin de soumission des offres",
   "complete_project": "Terminer le projet",
   "cannot_update_offer_status": "Impossible de mettre à jour le statut de l'offre en dehors de la phase d'évaluation",
@@ -220,6 +222,9 @@
   "offer_rejected_notification": "Votre offre pour le projet a été rejetée",
   "tender_stage_updated": "Mise à jour de l'étape de l'appel d'offres",
   "stage_updated_notification": "L'étape de l'appel d'offres a été mise à jour pour le projet"
-  
+ ,"publishing_tender": "Publication de l'appel d'offres en cours",
+  "unsupported_file_type": "Type de fichier non pris en charge",
+  "unsupported_image_type": "Type d'image non pris en charge"
+   
   
 }

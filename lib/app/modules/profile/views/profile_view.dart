@@ -45,10 +45,11 @@ class ProfileView extends StatelessWidget {
         CircleAvatar(
           radius: 60,
           backgroundColor: Colors.grey[300],
-          child: authController.profilePhotoUrl.value.isNotEmpty
+          child:
+              (authController.user.value?.profilePhotoUrl?.isNotEmpty ?? false)
               ? ClipOval(
                   child: Image.network(
-                    authController.profilePhotoUrl.value,
+                    authController.user.value!.profilePhotoUrl!,
                     width: 120,
                     height: 120,
                     fit: BoxFit.cover,

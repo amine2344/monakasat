@@ -1,5 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mounakassat_dz/firebase_options.dart';
@@ -12,13 +13,25 @@ import 'package:mounakassat_dz/app/routes/app_pages.dart';
 import 'app/controllers/theme_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app/data/services/firebase_service.dart';
+import 'storage/notification.storage.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await setupFlutterNotifications();
   showFlutterNotification(message);
-  // debugPrint('Handling a background message ${message.messageId}');
+  final userId = FirebaseService().auth.currentUser?.uid;
+  if (userId != null) {
+    await NotificationStorage().saveNotification(userId, {
+      'id':
+          message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      'title': message.notification?.title ?? 'No Title',
+      'body': message.notification?.body ?? 'No Body',
+      'receivedAt': DateTime.now().toIso8601String(),
+      'read': false,
+      'data': message.data,
+    });
+  }
 }
 
 AndroidNotificationChannel? channel;
@@ -76,7 +89,7 @@ Future<void> setupFlutterNotifications() async {
         );
 
     isFlutterLocalNotificationsInitialized = true;
-    // debugPrint('Flutter notifications initialized for $defaultTargetPlatform');
+    debugPrint('Flutter notifications initialized for $defaultTargetPlatform');
   }
 }
 
@@ -116,14 +129,22 @@ void showFlutterNotification(RemoteMessage message) {
         ),
       );
     }
-    // debugPrint('Notification shown: ${notification.title} - ${notification.body}');
+    debugPrint(
+      'Notification shown: ${notification.title} - ${notification.body}',
+    );
   } else {
-    // debugPrint('Notification not shown: ${message.data}');
+    debugPrint('Notification not shown: ${message.data}');
   }
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarBrightness: Brightness.dark,
+    ),
+  );
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await setupFlutterNotifications();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -131,7 +152,6 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   await dotenv.load(fileName: ".env");
 
-  // Initialize FirebaseService early
   Get.put(FirebaseService());
   debugPrint('FirebaseService initialized in main');
 
